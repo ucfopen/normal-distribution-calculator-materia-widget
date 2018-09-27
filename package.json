@@ -5,6 +5,7 @@
   },
   "version": "2.0.1",
   "dependencies": {
+    "chart.js": "^2.7.2",
     "materia-widget-development-kit": "1.2.2"
   },
   "scripts": {
