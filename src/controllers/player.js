@@ -99,7 +99,13 @@ function updateX(e) {
     var stddev = parseFloat(stddev_input.value);
     var x = parseInt(x_input.value);
     var probType = probType_input.value;
-    
+
+    // erase area under curve if X isNaN
+    if(isNaN(x) && chart.data.datasets.length > 1){
+      chart.data.datasets[1] = new Array(chart.data.datasets[1].data).fill(null);
+      chart.update(); 
+    }
+
     if(isNaN(mean)|| isNaN(stddev) || isNaN(x))
       return;
     
@@ -148,10 +154,14 @@ function generateChartData() {
   };
 
   // If they entered a x value then we highlight a section based on the dropdown probType's value
+  var dataSection;
+
   if(! isNaN(x)){
-    var dataSection;
     var index = x - lower_bound;
-    if(probType == "left") {
+    // if its out of bounds then we just fill it with nothing
+    if(index > chartData.length || index < 0)
+      dataSection = new Array(chartData).fill(null);
+    else if(probType == "left") {
       // erase after X
       dataSection =  chartData.slice(0, index + 1);
     }
@@ -170,14 +180,14 @@ function generateChartData() {
       for(var i = start + 1; i < end; i++)
         dataSection[i] = null;
     }
-
     data.datasets.push({
       label: probType,
       data: dataSection,
       backgroundColor: "#e7b0b0a3",
       fill: true
-      });
+    });
   }
+
   return data;
 }
 
