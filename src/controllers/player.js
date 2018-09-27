@@ -84,6 +84,11 @@ function culmulativeProb(x, mean, stddev) {
 // Something has changed, try to update chart's dataset
 function updateChart() {
   var data = generateChartData();
+
+  // Don't update with bad data
+  if(!data)
+    return;
+  
   chart.data = data;
   chart.update();
 }
@@ -94,6 +99,7 @@ function updateX(e) {
     var stddev = parseFloat(stddev_input.value);
     var x = parseInt(x_input.value);
     var probType = probType_input.value;
+    
     if(isNaN(mean)|| isNaN(stddev) || isNaN(x))
       return;
     
@@ -118,9 +124,10 @@ function generateChartData() {
   var x = parseInt(x_input.value);
   var probType = probType_input.value;
 
-
+  // Exit without calcs + cancel update
   if(isNaN(mean) || isNaN(stddev))
-    return;
+    return false;
+
   var lower_bound = mean - stddev * 3;
   var upper_bound = mean + stddev * 3;
 
@@ -140,7 +147,7 @@ function generateChartData() {
     highlightMean: mean,
   };
 
-  // Setup Highlighted Section here
+  // If they entered a x value then we highlight a section based on the dropdown probType's value
   if(! isNaN(x)){
     var dataSection;
     var index = x - lower_bound;
@@ -163,6 +170,7 @@ function generateChartData() {
       for(var i = start + 1; i < end; i++)
         dataSection[i] = null;
     }
+
     data.datasets.push({
       label: probType,
       data: dataSection,
