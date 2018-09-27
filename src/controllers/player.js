@@ -1,4 +1,4 @@
-//var Chart = require("chart.js");
+var Chart = require("chart.js");
 var mean_input = document.getElementById("mean");
 var stddev_input = document.getElementById("stddev");
 var x_input = document.getElementById("x");
