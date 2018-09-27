@@ -8,6 +8,7 @@ Installation
 * yarn install
 * yarn build
 * yarn start
+
 Visit the [Materia Widget Development Documentation](http://ucfcdl.github.io/Materia) for up to date details about installing widgets.
 
 Author
