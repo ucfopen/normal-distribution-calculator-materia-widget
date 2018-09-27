@@ -1,0 +1,32 @@
+{
+  "name": "@ucfcdl/hello-world",
+  "materia": {
+    "cleanName": "hello-world"
+  },
+  "version": "2.0.1",
+  "dependencies": {
+    "materia-widget-development-kit": "1.2.2"
+  },
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build-dev": "webpack",
+    "build": "webpack -p",
+    "pretest": "npm run build-dev",
+    "test": "karma start ./karma.conf.js --no-auto-watch --single-run"
+  },
+  "author": "University of Central Florida, Center for Distributed Learning",
+  "devDependencies": {
+    "angular": "~1.5.0",
+    "angular-loader": "~1.5.0",
+    "angular-mocks": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.22",
+    "karma-coverage": "^0.5.5",
+    "karma-eslint": "^2.1.0",
+    "karma-jasmine": "^0.3.8",
+    "karma-json-fixtures-preprocessor": "0.0.6",
+    "karma-mocha-reporter": "^2.1.0",
+    "karma-phantomjs-launcher": "^1.0.2"
+  }
+}

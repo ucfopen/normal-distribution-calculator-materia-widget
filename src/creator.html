@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- INJECTS IE CLASSES ONTO HTML TAG -->
+<!--[if IE 8 ]>    <html class="IE8"> <![endif]-->
+<!--[if IE 9 ]>    <html class="IE9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
+	<head>
+		<title>Hello Widget Creator</title>
+		<meta charset='utf-8' />
+
+		<!-- STYLESHEETS -->
+		<link rel='stylesheet' type='text/css' href='creator.css'>
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script src="materia.creatorcore.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js'></script>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="controllers/creator.js"></script>
+	</head>
+	<body ng-app='helloWidget' ng-controller='helloWidgetCreatorCtrl'>
+		<header>
+			<div>
+				<label>Your Widget Title:</label>
+				<div>
+					<input type='text' id='title' ng-model='title'/>
+				</div>
+			</div>
+			<div class='randomizer'>
+				<label>Randomize Answer Order:</label>
+				<input type='checkbox' ng-model='randomize'/>
+			</div>
+		</header>
+		<section id='main_area'>
+			<div id='question_container'></div>
+			<div class='qBox_container'>
+				<button class='add_question_box'
+					ng-click='addQuestion()'
+					ng-class="{ disabled: questions.length > 2 || currentQuestion }"
+					ng-disabled="questions.length > 2 || currentQuestion">
+					Click Here to Add a Question
+				</button>
+				<div class='question show'
+					ng-repeat='question in questions'
+					ng-click='selectQuestion(question)'
+					ng-class='{ selected: question == currentQuestion, disabled: currentQuestion && question != currentQuestion }'>
+					<div class='question_text'>{{ question.questions[0].text }}</div>
+				</div>
+			</div>
+		</section>
+		<section class = 'import_area' id='import_area'>
+			<h1>Imported Questions</h1>
+			<div id='import_question_area'>
+				<span class='add'></span>
+			</div>
+			<button id='import_hide'>Hide</button>
+		</section>
+
+		<div class='question_window'
+			ng-class="{ show: currentQuestion }">
+			<section class='QA'>
+				<h1>Question:</h1>
+				<textarea id='question_text'
+					ng-model='editingQuestion'>
+				</textarea>
+				<h1>Answers:</h1>
+				<div id='answer_area' class='answer_area'>
+					<div class='answer'
+						ng-repeat='answer in editingAnswers'>
+						<span class='letter'>{{ answerLetters[$index] }}</span>
+						<input type='text'
+							class='answer_text'
+							ng-model='answer.text'/>
+						<input type='checkbox'
+							class='answer_correct'
+							ng-model='answer.checked'
+							ng-change='answerChecked(answer)'
+							ng-checked='answer.value == 100'/>
+						<input type='tel'
+							pattern='[0-9]*'
+							class='answer_value'
+							ng-model='answer.value'
+							ng-change='cleanAnswerValue(answer)'/>
+						%
+						<span class='answer_remove' ng-click='removeAnswer($index)'></span>
+					</div>
+					<div id='add_answer'
+						class='add_answer'
+						ng-click='addAnswer()'
+						ng-hide='editingAnswers.length > 3'
+						tabindex=0>
+						Click Here To Add An Answer
+					</div>
+				</div>
+			</section>
+			<aside>
+				<button id='save' ng-click='saveEdit()'>Save</button>
+				<button id='cancel' ng-click='cancelEdit()'>Cancel</button>
+				<button id='delete' ng-click='deleteQuestion()'>Delete</button>
+			</aside>
+		</div>
+	</body>
+</html>

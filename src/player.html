@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Normal Distribution Calculator</title>
+		<link rel="stylesheet" type="text/css" href="player.css">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+		<script src="materia.enginecore.js"></script>
+	</head>
+	<body>
+		<div class="app">
+			<h1 class="app-header">Normal Distribution Calculator</h1>
+			<form class="app-form">
+				<label for="mean">&mu; =</label>
+				<input id="mean" type="number" min="-150" max="150" name="mean" value="0">
+				<label for="stddev">&sigma; =</label>
+				<input id="stddev" type="number" min="0" max="150" step="0.1" name="stddev" value="1">
+				<label for="x">x =</label>
+				<input id="x" type="text">
+				<select id="probType">
+					<option value="right">P(X &gt; x)=</option>
+					<option value="left">P(X &lt; x)=</option>
+					<option value="abs">2P(X &gt; |x|)=</option>
+				</select>
+				<input type="number" id="outAnswer">
+		</form>
+
+			<div id="canvasContainer">
+				<canvas id="canvas">
+				</canvas>
+			</div>
+			
+		</div>
+		<script src="controllers/player.js"></script>
+	</body>
+</html>
