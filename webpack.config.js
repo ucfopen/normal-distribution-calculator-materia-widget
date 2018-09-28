@@ -5,6 +5,7 @@ let webpackConfig = require('materia-widget-development-kit/webpack-widget').get
 
 // cusomize the config
 delete webpackConfig.entry['creator.js']
+delete webpackConfig.entry['creator.css']
 delete webpackConfig.entry['player.js']
 
 //webpackConfig.entry['controllers/creator.js'] = [path.join(__dirname, 'src', 'controllers', 'creator.coffee')]

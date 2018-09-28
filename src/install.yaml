@@ -12,22 +12,18 @@ general:
   is_storage_enabled: No
   api_version: 2
 files:
-  creator: creator.html
   player: player.html
   flash_version: 0
 score:
-  is_scorable: Yes
-  score_module: HelloWidget
+  is_scorable: No
 meta_data:
   features:
-    - Customizable
-    - Scorable
+    - Interactive
   supported_data:
     - Multiple Choice
   about: >
-    This is a simple widget for first-time 
-    Materia developers to get a feel for how Widgets work. 
+    Widget that allows you to change variables and watch the normal distribution graph change. 
 
   # The text displayed on the widget catalog page.
   excerpt: >
-    A basic "Hello World" type Widget for first-time Materia developers.
+    Change values and watch the normal distribution graph change
