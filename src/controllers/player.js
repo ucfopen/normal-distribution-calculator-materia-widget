@@ -2,7 +2,11 @@ var Chart = require("chart.js");
 var mean_input = document.getElementById("mean");
 var stddev_input = document.getElementById("stddev");
 var x_input = document.getElementById("x");
-var out_answer_input = document.getElementById("outAnswer");
+
+var leftOption = document.getElementById("leftOption");
+var rightOption = document.getElementById("rightOption");
+var absOption = document.getElementById("absOption");
+
 var probType_input = document.getElementById("probType");
 var ctx = document.getElementById("canvas").getContext('2d');
 
@@ -105,22 +109,20 @@ function updateX(e) {
     if(isNaN(x) && chart.data.datasets.length > 1){
       chart.data.datasets[1] = new Array(chart.data.datasets[1].data).fill(null);
       chart.update(); 
+      leftOption.innerHTML = `P(X &lt; x) = `;
+      rightOption.innerHTML = `P(X &gt; x) = `;
+      absOption.innerHTML = `2P(X &gt; |x|) = `;
     }
 
     if(isNaN(mean)|| isNaN(stddev) || isNaN(x))
       return;
-    
-    switch(probType) {
-      case "left":
-        out_answer_input.value = _round(culmulativeProb(x, mean, stddev), 5);
-        break;
-      case "right":
-      out_answer_input.value = _round(1 - culmulativeProb(x, mean, stddev), 5);
-        break;
-      case "abs":
-        out_answer_input.value = _round((1 - culmulativeProb(Math.abs(x), mean, stddev)) + culmulativeProb(-Math.abs(x), mean, stddev), 5);
-        break; 
-    }
+    var left =   _round(culmulativeProb(x, mean, stddev), 5);
+    var right = _round(1 - culmulativeProb(x, mean, stddev), 5);
+    var abs = _round((1 - culmulativeProb(Math.abs(x), mean, stddev)) + culmulativeProb(-Math.abs(x), mean, stddev), 5);
+    leftOption.innerHTML = `P(X &lt; x) = ${left}`;
+    rightOption.innerHTML = `P(X &gt; x) = ${right}`;
+    absOption.innerHTML = `2P(X &gt; |x|) = ${abs}`;
+
     updateChart();
 }
 

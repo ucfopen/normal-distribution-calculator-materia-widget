@@ -90,6 +90,7 @@ canvas {
 }
 
 .app-form > input, .app-form > select {
+	margin: 0 5px;
 	font-size: 16px;
 	flex: 0 0 50px;
 	width: 75px;
@@ -98,6 +99,7 @@ canvas {
 	transition: border-color .2s ease-in-out;
 }
 .app-form > select {
+	text-align-last: center;
 	flex: 0 0 170px;
 	text-indent: 0;
 	padding: 0;
