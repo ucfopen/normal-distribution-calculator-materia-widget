@@ -1,13 +1,14 @@
 var Chart = require("chart.js");
+
 var mean_input = document.getElementById("mean");
 var stddev_input = document.getElementById("stddev");
 var x_input = document.getElementById("x");
+var probType_input = document.getElementById("probType");
 
 var leftOption = document.getElementById("leftOption");
 var rightOption = document.getElementById("rightOption");
 var absOption = document.getElementById("absOption");
 
-var probType_input = document.getElementById("probType");
 var ctx = document.getElementById("canvas").getContext('2d');
 
 mean_input.addEventListener("input", updateChart);
