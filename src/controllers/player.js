@@ -103,7 +103,7 @@ function updateChart() {
 function updateX(e) {
     var mean = parseFloat(mean_input.value);
     var stddev = parseFloat(stddev_input.value);
-    var x = parseInt(x_input.value);
+    var x = parseFloat(x_input.value);
     var probType = probType_input.value;
 
     // erase area under curve if X isNaN
@@ -131,7 +131,7 @@ function updateX(e) {
 function generateChartData() {
   var mean = parseFloat(mean_input.value);
   var stddev = parseFloat(stddev_input.value);
-  var x = parseInt(x_input.value);
+  var x = parseFloat(x_input.value);
   var probType = probType_input.value;
 
   // Exit without calcs + cancel update
@@ -144,7 +144,7 @@ function generateChartData() {
   var chartData = [];
   var labels = [];
   for (var i = lower_bound; i <= upper_bound; i += 1.0) {
-    labels.push(i);
+    labels.push(_round(i, 2));
     chartData.push(_round(probDensity(i, mean, stddev), 3));
   }
   var data =  {
@@ -160,8 +160,21 @@ function generateChartData() {
   // If they entered a x value then we highlight a section based on the dropdown probType's value
   var dataSection;
 
-  if(! isNaN(x)){
+  if(! isNaN(x)) {
+    /*
+    if(! labels.includes(x)){
+      //labels.push(x);
+      chartData.push(_round(probDensity(x, mean, stddev), 2));
+    }
+    */
+    // console.log(x);
     var index = x - lower_bound;
+    data.xValue = x;
+    data.yValue = probDensity(x, mean, stddev);
+    data.highlightIndex = index;
+    data.probType = probType;
+    console.log(data.yValue);
+    /*
     // if its out of bounds then we just fill it with nothing
     if(index > chartData.length || index < 0)
       dataSection = new Array(chartData).fill(null);
@@ -184,12 +197,13 @@ function generateChartData() {
       for(var i = start + 1; i < end; i++)
         dataSection[i] = null;
     }
+    /*
     data.datasets.push({
       label: probType,
       data: dataSection,
       backgroundColor: "#e7b0b0a3",
       fill: true
-    });
+    });*/
   }
 
   return data;
@@ -243,21 +257,58 @@ var config = {
  */
 var chart = new Chart(ctx, config);
 
+function splineCurve(firstPoint, middlePoint, afterPoint, t) {
+    // Props to Rob Spencer at scaled innovation for his post on splining between points
+    // http://scaledinnovation.com/analytics/splines/aboutSplines.html
+
+    // This function must also respect "skipped" points
+
+    var previous = firstPoint.skip ? middlePoint : firstPoint;
+    var current = middlePoint;
+    var next = afterPoint.skip ? middlePoint : afterPoint;
+
+    var d01 = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2));
+    var d12 = Math.sqrt(Math.pow(next.x - current.x, 2) + Math.pow(next.y - current.y, 2));
+
+    var s01 = d01 / (d01 + d12);
+    var s12 = d12 / (d01 + d12);
+
+    // If all points are the same, s01 & s02 will be inf
+    s01 = isNaN(s01) ? 0 : s01;
+    s12 = isNaN(s12) ? 0 : s12;
+
+    var fa = t * s01; // scaling factor for triangle Ta
+    var fb = t * s12;
+
+    return {
+      previous: {
+        x: current.x - fa * (next.x - previous.x),
+        y: current.y - fa * (next.y - previous.y)
+      },
+      next: {
+        x: current.x + fb * (next.x - previous.x),
+        y: current.y + fb * (next.y - previous.y)
+      }
+    };
+  };
+
 // Original Draw
 var originalLineDraw = Chart.controllers.line.prototype.draw;
 // Extend the line chart, in order to override the draw function.
 Chart.helpers.extend(Chart.controllers.line.prototype, {
   draw: function() {
+
     var chart = this.chart;
+    var ctx = chart.chart.ctx;
+    var xaxis = chart.scales['x-axis-0'];
+    var yaxis = chart.scales['y-axis-0'];
+    
+    var points = this.getMeta().data;
     // Get the object that determines the region to highlight.
     var highlightMean = chart.config.data.highlightMean;
 
     // Highlight mean on the graph
     if(highlightMean !== undefined && highlightMean !== null) {
-      var ctx = chart.chart.ctx;
-      
-      var xaxis = chart.scales['x-axis-0'];
-      var yaxis = chart.scales['y-axis-0'];
       
       var pixelValue = xaxis.getPixelForValue(highlightMean);
       var nextPixelValue = xaxis.getPixelForValue(highlightMean + 1);
@@ -267,7 +318,107 @@ Chart.helpers.extend(Chart.controllers.line.prototype, {
 
       ctx.restore();
     }
-    // Apply the original draw function for the line chart.
+
+    var highlightIndex = chart.config.data.highlightIndex;
+    var probType = chart.config.data.probType;
+    var yValue = chart.config.data.yValue;
+    var xValue = chart.config.data.xValue;
+    // Draw pink highlighted area
+    if(highlightIndex !== undefined && highlightIndex !== null) {
+      // We have to figure out the position of halves in x coord
+      var xcoord;
+      if(xValue !== Math.floor(xValue)) {
+        let round = Math.floor(xValue);
+        let percent = Math.abs(xValue - round);
+        // linear interop of value
+        xcoord = (xaxis.getPixelForValue(round) * (1 - percent) + xaxis.getPixelForValue(round + 1) * (percent));
+      }
+      else {
+        xcoord = xaxis.getPixelForValue(xValue);
+      }
+      let pointIndex = Math.round(highlightIndex);
+      ctx.save();
+      ctx.fillStyle = '#e7b0b0a3';
+      // Handle left
+      if(probType == "right") {
+        let pointIndex = Math.round(highlightIndex);
+        ctx.beginPath();
+        ctx.moveTo(xcoord, yaxis.getPixelForValue(0));
+        ctx.lineTo(xcoord, yaxis.getPixelForValue(yValue));
+        // fill in the right side
+        for(var i = pointIndex, ilen = points.length; i < ilen; ++i) {
+          var model = points[i]._model;
+          let prevModel = i > pointIndex ? points[i-1]._model : model;
+          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
+        }
+        ctx.lineTo(model.x, yaxis.getPixelForValue(0));
+
+        ctx.fill();
+      }
+      else if(probType == "left") {
+        let pointIndex = Math.floor(highlightIndex);
+        ctx.beginPath();
+        ctx.moveTo(points[0]._model.x, yaxis.getPixelForValue(0));
+        ctx.lineTo(points[0]._model.x, points[0]._model.y);
+        // fill in the right side
+        for(var i = 0, ilen = pointIndex; i <= ilen; ++i) {
+          var model = points[i]._model;
+          var prevModel = i > 0 ? points[i-1]._model : model;
+          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
+        }
+        let nextModel = i > points.length ? model : points[i + 1]._model;
+        let y = yaxis.getPixelForValue(yValue);
+        let curve = splineCurve(model,  {x: xcoord, y: y, skip:false}, nextModel,   0.1);
+        console.log(xcoord, prevModel.controlPointPreviousX, curve.previous.x);
+        ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, curve.previous.x, curve.previous.y, xcoord, y);
+        ctx.lineTo(xcoord, yaxis.getPixelForValue(0));
+
+        ctx.fill();
+      }
+      else if(probType == "abs") {
+        var other_index = pointIndex +  (Math.floor(points.length / 2) - pointIndex) * 2;
+        // Not sure which one is bigger or smaller
+        var left = Math.min(pointIndex, other_index);
+        var right = Math.max(pointIndex, other_index);
+
+        // Left first
+        let pointIndex = Math.floor(left);
+        ctx.beginPath();
+        ctx.moveTo(points[0]._model.x, yaxis.getPixelForValue(0));
+        ctx.lineTo(points[0]._model.x, points[0]._model.y);
+        // fill in the right side
+        for(var i = 0, ilen = pointIndex; i <= ilen; ++i) {
+          var model = points[i]._model;
+          var prevModel = i > 0 ? points[i-1]._model : model;
+          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
+        }
+        let nextModel = i > points.length ? model : points[i + 1]._model;
+        let y = yaxis.getPixelForValue(yValue);
+        let curve = splineCurve(model,  {x: xcoord, y: y, skip:false}, nextModel,   0.1);
+        console.log(xcoord, prevModel.controlPointPreviousX, curve.previous.x);
+        ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, curve.previous.x, curve.previous.y, xcoord, y);
+        ctx.lineTo(xcoord, yaxis.getPixelForValue(0));
+
+        ctx.fill();
+       // Right now
+       pointIndex = Math.round(right);
+       ctx.beginPath();
+       ctx.moveTo(xcoord, yaxis.getPixelForValue(0));
+       ctx.lineTo(xcoord, yaxis.getPixelForValue(yValue));
+       // fill in the right side
+       for(var i = pointIndex, ilen = points.length; i < ilen; ++i) {
+         var model = points[i]._model;
+         let prevModel = i > pointIndex ? points[i-1]._model : model;
+         ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
+       }
+       ctx.lineTo(model.x, yaxis.getPixelForValue(0));
+
+       ctx.fill();
+
+      }
+      ctx.restore();
+    }
+        // Apply the original draw function for the line chart.
     originalLineDraw.apply(this, arguments);
   }
 });
