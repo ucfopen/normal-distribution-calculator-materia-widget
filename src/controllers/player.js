@@ -1,20 +1,21 @@
-var Chart = require("chart.js");
-
 var mean_input = document.getElementById("mean");
 var stddev_input = document.getElementById("stddev");
 var x_input = document.getElementById("x");
 var probType_input = document.getElementById("probType");
 
+var mean_output = document.getElementById("meanOut");
+var stddev_output = document.getElementById("stddevOut");
+var var_output = document.getElementById("varOut");
+
 var leftOption = document.getElementById("leftOption");
 var rightOption = document.getElementById("rightOption");
 var absOption = document.getElementById("absOption");
-
-var ctx = document.getElementById("canvas").getContext('2d');
 
 mean_input.addEventListener("input", updateChart);
 stddev_input.addEventListener("input", updateChart);
 x_input.addEventListener("input", updateX);
 probType_input.addEventListener("input", updateX);
+var myGraph; // will hold graph object
 
 // Z table for lookups
 var zTable = {
@@ -89,37 +90,57 @@ function culmulativeProb(x, mean, stddev) {
 
 // Something has changed, try to update chart's dataset
 function updateChart() {
-  var data = generateChartData();
+  const mean = parseFloat(mean_input.value);
+  const stddev = parseFloat(stddev_input.value);
+  const x = parseFloat(x_input.value);
+  const probType = probType_input.value;
 
-  // Don't update with bad data
-  if(!data)
-    return;
-  
-  chart.data = data;
-  chart.update();
+  let minX = mean - stddev * 3;
+  let maxX = mean + stddev * 3;
+  myGraph = new Graph({
+          canvas: myCanvas,
+          minX: minX,
+          minY: 0,
+          maxX: maxX,
+          maxY: 0.5,
+          tickX: stddev,
+          equation: function(x) { return probDensity(x, mean, stddev); },
+        });
+  myGraph.draw();
+  mean_output.innerHTML = mean;
+  stddev_output.innerHTML = stddev;
+  var_output.innerHTML = Math.pow(stddev, 2).toFixed(2);
+  if(isNaN(x) || x < minX || x > maxX) return;
+  // Highlight X
+  myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
+  // Highlight selected area
+  if(probType == "left") {
+    myGraph.highlightArea(minX, x, '#f1cdccb8');
+  }
+  else if(probType == "right") {
+    myGraph.highlightArea(x, maxX, '#f1cdccb8');
+  }
+  else if(probType == "abs") {
+    let left = -Math.abs(x);
+    let right = Math.abs(x);
+    myGraph.highlightArea(minX, left, '#f1cdccb8');
+    myGraph.highlightArea(right, maxX, '#f1cdccb8');
+
+  }
+
 }
 
 // X input has changed, try to give answer and then update chart
 function updateX(e) {
-    var mean = parseFloat(mean_input.value);
-    var stddev = parseFloat(stddev_input.value);
-    var x = parseFloat(x_input.value);
-    var probType = probType_input.value;
-
-    // erase area under curve if X isNaN
-    if(isNaN(x) && chart.data.datasets.length > 1){
-      chart.data.datasets[1] = new Array(chart.data.datasets[1].data).fill(null);
-      chart.update(); 
-      leftOption.innerHTML = `P(X &lt; x) = `;
-      rightOption.innerHTML = `P(X &gt; x) = `;
-      absOption.innerHTML = `2P(X &gt; |x|) = `;
-    }
-
+    const mean = parseFloat(mean_input.value);
+    const stddev = parseFloat(stddev_input.value);
+    const x = parseFloat(x_input.value);
+    const probType = probType_input.value;
     if(isNaN(mean)|| isNaN(stddev) || isNaN(x))
       return;
-    var left =   _round(culmulativeProb(x, mean, stddev), 5);
-    var right = _round(1 - culmulativeProb(x, mean, stddev), 5);
-    var abs = _round((1 - culmulativeProb(Math.abs(x), mean, stddev)) + culmulativeProb(-Math.abs(x), mean, stddev), 5);
+    const left =   _round(culmulativeProb(x, mean, stddev), 5);
+    const right = _round(1 - culmulativeProb(x, mean, stddev), 5);
+    const abs = _round((1 - culmulativeProb(Math.abs(x), mean, stddev)) + culmulativeProb(-Math.abs(x), mean, stddev), 5);
     leftOption.innerHTML = `P(X &lt; x) = ${left}`;
     rightOption.innerHTML = `P(X &gt; x) = ${right}`;
     absOption.innerHTML = `2P(X &gt; |x|) = ${abs}`;
@@ -127,298 +148,274 @@ function updateX(e) {
     updateChart();
 }
 
-// Generate chart's dataset(s) from input fields
-function generateChartData() {
-  var mean = parseFloat(mean_input.value);
-  var stddev = parseFloat(stddev_input.value);
-  var x = parseFloat(x_input.value);
-  var probType = probType_input.value;
-
-  // Exit without calcs + cancel update
-  if(isNaN(mean) || isNaN(stddev))
-    return false;
-
-  var lower_bound = mean - stddev * 3;
-  var upper_bound = mean + stddev * 3;
-
-  var chartData = [];
-  var labels = [];
-  for (var i = lower_bound; i <= upper_bound; i += 1.0) {
-    labels.push(_round(i, 2));
-    chartData.push(_round(probDensity(i, mean, stddev), 3));
-  }
-  var data =  {
-    labels: labels,
-    datasets: [{
-      label: 'F(x)',
-      data: chartData,
-      fill: false,
-    }],
-    highlightMean: mean,
-  };
-
-  // If they entered a x value then we highlight a section based on the dropdown probType's value
-  var dataSection;
-
-  if(! isNaN(x)) {
-    /*
-    if(! labels.includes(x)){
-      //labels.push(x);
-      chartData.push(_round(probDensity(x, mean, stddev), 2));
-    }
-    */
-    // console.log(x);
-    var index = x - lower_bound;
-    data.xValue = x;
-    data.yValue = probDensity(x, mean, stddev);
-    data.highlightIndex = index;
-    data.probType = probType;
-    console.log(data.yValue);
-    /*
-    // if its out of bounds then we just fill it with nothing
-    if(index > chartData.length || index < 0)
-      dataSection = new Array(chartData).fill(null);
-    else if(probType == "left") {
-      // erase after X
-      dataSection =  chartData.slice(0, index + 1);
-    }
-    else if(probType == "right") {
-      // padd with null before X
-      dataSection = new Array(index).fill(null).concat(chartData.slice(index));
-    }
-    else if(probType == "abs") {
-      // Erase between x and -x
-      dataSection = chartData.slice();
-      // Index of negative/positive counterpart of x
-      var other_index = index +  (Math.floor(chartData.length / 2) - index) * 2;
-      // Not sure which one is bigger or smaller
-      var start = Math.min(index, other_index);
-      var end = Math.max(index, other_index);
-      for(var i = start + 1; i < end; i++)
-        dataSection[i] = null;
-    }
-    /*
-    data.datasets.push({
-      label: probType,
-      data: dataSection,
-      backgroundColor: "#e7b0b0a3",
-      fill: true
-    });*/
-  }
-
-  return data;
+function Graph(config) {
+  this.init(config);
 }
 
+Graph.prototype.init = function(config) {
+  // user defined properties
+  this.canvas = config.canvas;
+  
+  this.minX = config.minX || 0;
+  this.minY = config.minY || 0;
+  
+  this.maxX = config.maxX || 10;
+  this.maxY = config.maxY || 10;
+  
+  this.marginX = config.maginX || 60;
+  this.marginY = config.marginY || 45;
+  this.marginTop = config.marginTop || 20;
+  this.marginRight = config.marginRight || 15;
 
-// init chart render
-var data = generateChartData();
+  this.labelX = config.labelX || "x";
+  this.labelY = config.labelY || "f(x)";
+  
+  this.equation = config.equation;
+  // How many samples to take inbetween each point
+  this.resolution = config.resolution || 100;
+  
+  this.tickX = config.tickX || 1;
+  this.iteration = (this.maxX - this.minX) / this.resolution;
+  if(config.tickY)
+  {
+    this.tickY = config.tickY;
+  }
+  else {
+    this.calcY();
+  }
 
-var config = {
-  type: 'line',
-  data: data,
-  options: {
-    legend: {
-      display: false
-    },
-    responsive: true,
-    title: {
-      display: false,
-      text: "Normal Distribution"
-    },
-    tooltips: {
-      // Hides datasets that don't have the label F(x)
-      custom: function(tooltipModel) {
-                if (tooltipModel.body && tooltipModel.body[0].lines && tooltipModel.body[0].lines[0].indexOf("F(x)") == -1) {
-                  tooltipModel.opacity = 0;
-                }
-      }
-    },
-    scales: {
-      xAxes: [{
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'X'
-        }
-      }],
-      yAxes: [{
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'F(x)'
-        }
-      }]
-    }
+  // constants
+  this.axisColor = '#aaa';
+  this.font = '12pt Calibri';
+  this.tickSize = 5;
+
+  // relationships
+  this.context = this.canvas.getContext('2d');
+
+  this.rangeX = this.maxX - this.minX;
+  this.rangeY = this.maxY - this.minY;
+  
+  this.tickCountX = this.rangeX / this.tickX;
+  this.tickCountY = this.rangeY / this.tickY;
+
+  this.unitX = (this.canvas.width - this.marginX - this.marginRight) / (this.tickCountX + 1);
+  this.unitY = (this.canvas.height - this.marginY - this.marginTop) / (this.tickCountY + 1);
+  this.scaleX = (this.canvas.width - this.marginX - this.marginRight) / this.rangeX;
+  this.scaleY = (this.canvas.height - this.marginY - this.marginTop) / this.rangeY;
+
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  // draw x and y axis
+  this.drawAxes();
+};
+
+Graph.prototype.calcY = function() {
+
+  let max = Number.NEGATIVE_INFINITY;
+  let min = Number.POSITIVE_INFINITY;
+  for(let x = this.minX; x < this.maxX; x += this.tickX) {
+    let y = this.equation(x);
+    if(y < min) min = y;
+    if(y > max) max = y;
+  }
+  let range = max - min;
+  let tickRange = range / 5.0;
+  let pow10x = Math.pow(10, Math.ceil(Math.log(tickRange) - 1));
+  let roundedTickRange = Math.ceil(tickRange / pow10x) * pow10x;
+
+  this.minY = Math.floor(min * Math.pow(10, 2)) / Math.pow(10, 2);
+  this.maxY = Math.ceil(max * Math.pow(10, 2)) / Math.pow(10, 2);
+  this.tickY = Number(roundedTickRange.toFixed(2));
+};
+
+// Draw axes and labels for them
+Graph.prototype.drawAxes = function(){
+  var context = this.context;
+  context.resetTransform();
+  this.transformContext();
+  this.drawXAxis();
+  this.drawYAxis();
+  this.drawText(this.labelX, this.getPixelX((this.maxX + this.minX)/2), this.marginY / 3);
+  // draw this one rotated
+  context.save();
+  context.resetTransform();
+  context.translate(5, this.canvas.height - this.getPixelY((this.maxY + this.minY) / 2));
+  context.rotate(-90 * Math.PI / 180);
+  context.fillText(this.labelY, 0, 0);
+  context.restore();
+};
+
+Graph.prototype.drawXAxis = function() {
+  var context = this.context;        
+  // Draw x axis
+  context.beginPath();
+  context.moveTo(this.marginX, this.marginY);
+  context.lineTo(this.canvas.width - this.marginRight, this.marginY);
+  context.strokeStyle = this.axisColor;
+  context.lineWidth = 2;
+  context.stroke();
+
+  // draw tick marks
+  var xPosIncrement = this.tickX * (this.unitX);
+  context.font = this.font;
+  context.textAlign = 'center';
+  context.textBaseline = 'top';
+
+  let xPos = this.marginX;
+  let yPos = Math.floor(this.marginY / 2);
+  for(let x = this.minX; x <= this.maxX; x+= this.tickX) {
+    xPos = this.getPixelX(x);
+    context.moveTo(xPos, this.marginY - this.tickSize / 2);
+    context.lineTo(xPos, this.marginY + this.tickSize / 2);
+    context.stroke();
+    this.drawText(x, xPos, this.marginY - 5);
+    xPos = Math.round(xPos + xPosIncrement);
   }
 };
 
-/**
- * Create a chart
- */
-var chart = new Chart(ctx, config);
+Graph.prototype.drawYAxis = function() {
+  var context = this.context;
+  context.beginPath();
+  context.moveTo(this.marginX, this.marginY);
+  context.lineTo(this.marginX, this.canvas.height - this.marginTop);
+  context.strokeStyle = this.axisColor;
+  context.lineWidth = 2;
+  context.stroke();
 
-function splineCurve(firstPoint, middlePoint, afterPoint, t) {
-    // Props to Rob Spencer at scaled innovation for his post on splining between points
-    // http://scaledinnovation.com/analytics/splines/aboutSplines.html
+  // draw tick marks
+  context.font = this.font;
+  context.textAlign = 'right';
+  context.textBaseline = 'middle';
 
-    // This function must also respect "skipped" points
+  let xPos = Math.floor(this.marginX / 2);
+  let yPos = this.marginY;
+  for(let y = this.minY; y <= this.maxY; y+= this.tickY) {
+    yPos = this.getPixelY(y);
+    context.moveTo(this.marginX - this.tickSize / 2, yPos);
+    context.lineTo(this.marginX + this.tickSize / 2, yPos);
+    context.stroke();
+    this.drawText(y, this.marginX - 5, yPos);
+  }
+};
+// We have to flip our Y again when drawing text
+// If this ever gets so slow we should batch these to reduce context changes
+Graph.prototype.drawText = function(text, x, y) {
+  let context = this.context;
+  context.save();
+  y = this.canvas.height - y;
+  context.resetTransform();
+  // is text a number
+  if(!isNaN(text)) {
+    text = text == Math.floor(text) ? text : text.toFixed(2); // Convert to at most 2 digits decimal 
+  }
+  context.fillText(text, x, y);
+  context.restore();
+};
 
-    var previous = firstPoint.skip ? middlePoint : firstPoint;
-    var current = middlePoint;
-    var next = afterPoint.skip ? middlePoint : afterPoint;
+// Translate a real X value from a formula into the pixel X value we draw onto the graph
+Graph.prototype.getPixelX = function(x) {
+  return this.marginX + (x - this.minX)  * this.scaleX;
+};
 
-    var d01 = Math.sqrt(Math.pow(current.x - previous.x, 2) + Math.pow(current.y - previous.y, 2));
-    var d12 = Math.sqrt(Math.pow(next.x - current.x, 2) + Math.pow(next.y - current.y, 2));
+Graph.prototype.getPixelY = function(y) {
+  return this.marginY + (y - this.minY) * this.scaleY;
+};
 
-    var s01 = d01 / (d01 + d12);
-    var s12 = d12 / (d01 + d12);
+Graph.prototype.draw = function() {
+  var context = this.context;
+  let equation = this.equation
 
-    // If all points are the same, s01 & s02 will be inf
-    s01 = isNaN(s01) ? 0 : s01;
-    s12 = isNaN(s12) ? 0 : s12;
-
-    var fa = t * s01; // scaling factor for triangle Ta
-    var fb = t * s12;
-
-    return {
-      previous: {
-        x: current.x - fa * (next.x - previous.x),
-        y: current.y - fa * (next.y - previous.y)
-      },
-      next: {
-        x: current.x + fb * (next.x - previous.x),
-        y: current.y + fb * (next.y - previous.y)
-      }
-    };
-  };
-
-// Original Draw
-var originalLineDraw = Chart.controllers.line.prototype.draw;
-// Extend the line chart, in order to override the draw function.
-Chart.helpers.extend(Chart.controllers.line.prototype, {
-  draw: function() {
-
-    var chart = this.chart;
-    var ctx = chart.chart.ctx;
-    var xaxis = chart.scales['x-axis-0'];
-    var yaxis = chart.scales['y-axis-0'];
+  context.save();
+  context.beginPath();
+  context.moveTo(this.getPixelX(this.minX), this.getPixelY(equation(this.minX)));
+  let clip = false;
+  for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
+    let y = equation(x);
     
-    var points = this.getMeta().data;
-    // Get the object that determines the region to highlight.
-    var highlightMean = chart.config.data.highlightMean;
-
-    // Highlight mean on the graph
-    if(highlightMean !== undefined && highlightMean !== null) {
-      
-      var pixelValue = xaxis.getPixelForValue(highlightMean);
-      var nextPixelValue = xaxis.getPixelForValue(highlightMean + 1);
-      ctx.save();
-      ctx.fillStyle = '#83a9f1';
-      ctx.fillRect(pixelValue - 2.5, yaxis.bottom, 5, yaxis.top - yaxis.bottom);
-
-      ctx.restore();
-    }
-
-    var highlightIndex = chart.config.data.highlightIndex;
-    var probType = chart.config.data.probType;
-    var yValue = chart.config.data.yValue;
-    var xValue = chart.config.data.xValue;
-    // Draw pink highlighted area
-    if(highlightIndex !== undefined && highlightIndex !== null) {
-      // We have to figure out the position of halves in x coord
-      var xcoord;
-      if(xValue !== Math.floor(xValue)) {
-        let round = Math.floor(xValue);
-        let percent = Math.abs(xValue - round);
-        // linear interop of value
-        xcoord = (xaxis.getPixelForValue(round) * (1 - percent) + xaxis.getPixelForValue(round + 1) * (percent));
+    // Handle not drawing below minY or above maxY
+    if(y < this.minY ) {
+      if(clip) {
+        context.moveTo(this.getPixelX(x), this.getPixelY(this.minY));
       }
       else {
-        xcoord = xaxis.getPixelForValue(xValue);
+        context.lineTo(this.getPixelX(x), this.getPixelY(this.minY));
+        clip = true;
       }
-      let pointIndex = Math.round(highlightIndex);
-      ctx.save();
-      ctx.fillStyle = '#e7b0b0a3';
-      // Handle left
-      if(probType == "right") {
-        let pointIndex = Math.round(highlightIndex);
-        ctx.beginPath();
-        ctx.moveTo(xcoord, yaxis.getPixelForValue(0));
-        ctx.lineTo(xcoord, yaxis.getPixelForValue(yValue));
-        // fill in the right side
-        for(var i = pointIndex, ilen = points.length; i < ilen; ++i) {
-          var model = points[i]._model;
-          let prevModel = i > pointIndex ? points[i-1]._model : model;
-          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
-        }
-        ctx.lineTo(model.x, yaxis.getPixelForValue(0));
-
-        ctx.fill();
-      }
-      else if(probType == "left") {
-        let pointIndex = Math.floor(highlightIndex);
-        ctx.beginPath();
-        ctx.moveTo(points[0]._model.x, yaxis.getPixelForValue(0));
-        ctx.lineTo(points[0]._model.x, points[0]._model.y);
-        // fill in the right side
-        for(var i = 0, ilen = pointIndex; i <= ilen; ++i) {
-          var model = points[i]._model;
-          var prevModel = i > 0 ? points[i-1]._model : model;
-          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
-        }
-        let nextModel = i > points.length ? model : points[i + 1]._model;
-        let y = yaxis.getPixelForValue(yValue);
-        let curve = splineCurve(model,  {x: xcoord, y: y, skip:false}, nextModel,   0.1);
-        console.log(xcoord, prevModel.controlPointPreviousX, curve.previous.x);
-        ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, curve.previous.x, curve.previous.y, xcoord, y);
-        ctx.lineTo(xcoord, yaxis.getPixelForValue(0));
-
-        ctx.fill();
-      }
-      else if(probType == "abs") {
-        var other_index = pointIndex +  (Math.floor(points.length / 2) - pointIndex) * 2;
-        // Not sure which one is bigger or smaller
-        var left = Math.min(pointIndex, other_index);
-        var right = Math.max(pointIndex, other_index);
-
-        // Left first
-        let pointIndex = Math.floor(left);
-        ctx.beginPath();
-        ctx.moveTo(points[0]._model.x, yaxis.getPixelForValue(0));
-        ctx.lineTo(points[0]._model.x, points[0]._model.y);
-        // fill in the right side
-        for(var i = 0, ilen = pointIndex; i <= ilen; ++i) {
-          var model = points[i]._model;
-          var prevModel = i > 0 ? points[i-1]._model : model;
-          ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
-        }
-        let nextModel = i > points.length ? model : points[i + 1]._model;
-        let y = yaxis.getPixelForValue(yValue);
-        let curve = splineCurve(model,  {x: xcoord, y: y, skip:false}, nextModel,   0.1);
-        console.log(xcoord, prevModel.controlPointPreviousX, curve.previous.x);
-        ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, curve.previous.x, curve.previous.y, xcoord, y);
-        ctx.lineTo(xcoord, yaxis.getPixelForValue(0));
-
-        ctx.fill();
-       // Right now
-       pointIndex = Math.round(right);
-       ctx.beginPath();
-       ctx.moveTo(xcoord, yaxis.getPixelForValue(0));
-       ctx.lineTo(xcoord, yaxis.getPixelForValue(yValue));
-       // fill in the right side
-       for(var i = pointIndex, ilen = points.length; i < ilen; ++i) {
-         var model = points[i]._model;
-         let prevModel = i > pointIndex ? points[i-1]._model : model;
-         ctx.bezierCurveTo(prevModel.controlPointNextX, prevModel.controlPointNextY, model.controlPointPreviousX, model.controlPointPreviousY, model.x, model.y);
-       }
-       ctx.lineTo(model.x, yaxis.getPixelForValue(0));
-
-       ctx.fill();
-
-      }
-      ctx.restore();
+      continue;
     }
-        // Apply the original draw function for the line chart.
-    originalLineDraw.apply(this, arguments);
+
+    else if(y > this.maxY) {
+      if(clip) {
+        context.moveTo(this.getPixelX(x), this.getPixelY(this.maxY));
+      }
+      else {
+        context.lineTo(this.getPixelX(x), this.getPixelY(this.maxY));
+        clip = true;
+      }
+      continue;
+    }
+    clip = false;
+    context.lineTo(this.getPixelX(x), this.getPixelY(y));
   }
-});
+  context.lineJoin = 'round';
+  context.lineWidth = 3;
+  context.strokeStyle = "green";
+  context.stroke();
+  context.restore();
+};
+
+Graph.prototype.highlightArea = function(startX, endX, color) {
+  var context = this.context;
+  let equation = this.equation;
+  context.save();
+  context.beginPath();
+  
+  let startY = equation(startX);
+  context.moveTo(this.getPixelX(startX), this.getPixelY(this.minY));
+  startY = Math.max(startY, this.minY);
+  context.lineTo(this.getPixelX(startX), this.getPixelY(startY));
+  for(var x = startX + this.iteration; x < endX; x += this.iteration) {
+    let y = equation(x);
+    context.lineTo(this.getPixelX(x), this.getPixelY(y));
+  }
+  context.lineTo(this.getPixelX(x), this.getPixelY(this.minY));
+  context.lineJoin = 'round';
+  context.lineWidth = 3;
+  context.fillStyle = color;
+  context.fill();
+  context.restore();
+};
+
+Graph.prototype.transformContext = function() {
+  var context = this.context;
+  context.transform(1, 0, 0, -1, 0, this.canvas.height);
+};
+
+var PIXEL_RATIO = (function () {
+    var ctx = document.createElement("canvas").getContext("2d"),
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+              ctx.mozBackingStorePixelRatio ||
+              ctx.msBackingStorePixelRatio ||
+              ctx.oBackingStorePixelRatio ||
+              ctx.backingStorePixelRatio || 1;
+
+    return dpr / bsr;
+})();
+
+
+var createHiDPICanvas = function(w, h, ratio) {
+    if (!ratio) { ratio = PIXEL_RATIO; }
+    var can = document.createElement("canvas");
+    can.width = w * ratio;
+    can.height = h * ratio;
+    can.style.width = w + "px";
+    can.style.height = h + "px";
+    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+    return can;
+}
+
+//Create canvas with the device resolution.
+var myCanvas = createHiDPICanvas(500, 320, 1);
+// Add canvas
+document.getElementById("canvasContainer").appendChild(myCanvas);
+var ctx = myCanvas.getContext('2d');

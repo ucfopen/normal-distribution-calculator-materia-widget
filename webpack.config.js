@@ -9,6 +9,7 @@ delete webpackConfig.entry['creator.css']
 delete webpackConfig.entry['player.js']
 
 //webpackConfig.entry['controllers/creator.js'] = [path.join(__dirname, 'src', 'controllers', 'creator.coffee')]
+// webpackConfig.entry['controllers/graph.js'] = [path.join(__dirname, 'src', 'controllers', 'graph.js')]
 webpackConfig.entry['controllers/player.js'] = [path.join(__dirname, 'src', 'controllers', 'player.js')]
 
 webpackConfig.module.rules[0] = {
