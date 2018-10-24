@@ -88,7 +88,7 @@ function culmulativeProb(x, mean, stddev) {
   return z < 0 ? 1 - absPercentile : absPercentile;
 }
 
-// Something has changed, try to update chart's dataset
+// Something has changed, try to update chart
 function updateChart() {
   const mean = parseFloat(mean_input.value);
   const stddev = parseFloat(stddev_input.value);
@@ -105,14 +105,19 @@ function updateChart() {
           maxY: 0.5,
           tickX: stddev,
           equation: function(x) { return probDensity(x, mean, stddev); },
-        });
+  });
+
   myGraph.draw();
+
+  // update info panel on bottom
   mean_output.innerHTML = mean;
   stddev_output.innerHTML = stddev;
   var_output.innerHTML = Math.pow(stddev, 2).toFixed(2);
+  
   if(isNaN(x) || x < minX || x > maxX) return;
   // Highlight X
   myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
+  
   // Highlight selected area
   if(probType == "left") {
     myGraph.highlightArea(minX, x, '#f1cdccb8');
@@ -157,25 +162,32 @@ Graph.prototype.init = function(config) {
   this.canvas = config.canvas;
   
   this.minX = config.minX || 0;
-  this.minY = config.minY || 0;
+  this.minY = config.minY || 0; // for use if tickY isn't set
   
   this.maxX = config.maxX || 10;
-  this.maxY = config.maxY || 10;
+  this.maxY = config.maxY || 10; // for use if tickY isn't set
   
+  // Space on left until X's 0 starts (axis and label are drawn in this space)
   this.marginX = config.maginX || 60;
+  // Space on bottom until Y's 0 starts (axis and label are drawn in this space)
   this.marginY = config.marginY || 45;
+  // Space on top of graph, usually just makes sure things don't get cut off
   this.marginTop = config.marginTop || 20;
+  // Space to the right of the graph, just prevents tings from cutting off
   this.marginRight = config.marginRight || 15;
 
   this.labelX = config.labelX || "x";
   this.labelY = config.labelY || "f(x)";
   
+  this.color = config.color || "green";
+
   this.equation = config.equation;
   // How many samples to take inbetween each point
   this.resolution = config.resolution || 100;
   
   this.tickX = config.tickX || 1;
   this.iteration = (this.maxX - this.minX) / this.resolution;
+  // If tickY is set use that, otherwise we recalculate tickY, minY, and maxY based on equation and min/max X
   if(config.tickY)
   {
     this.tickY = config.tickY;
@@ -194,12 +206,8 @@ Graph.prototype.init = function(config) {
 
   this.rangeX = this.maxX - this.minX;
   this.rangeY = this.maxY - this.minY;
-  
-  this.tickCountX = this.rangeX / this.tickX;
-  this.tickCountY = this.rangeY / this.tickY;
 
-  this.unitX = (this.canvas.width - this.marginX - this.marginRight) / (this.tickCountX + 1);
-  this.unitY = (this.canvas.height - this.marginY - this.marginTop) / (this.tickCountY + 1);
+  // Scale used to map calcuated X,Y -> Canvas X,Y for graphing
   this.scaleX = (this.canvas.width - this.marginX - this.marginRight) / this.rangeX;
   this.scaleY = (this.canvas.height - this.marginY - this.marginTop) / this.rangeY;
 
@@ -208,6 +216,7 @@ Graph.prototype.init = function(config) {
   this.drawAxes();
 };
 
+// Figure out ticks on Y axis
 Graph.prototype.calcY = function() {
 
   let max = Number.NEGATIVE_INFINITY;
@@ -244,6 +253,7 @@ Graph.prototype.drawAxes = function(){
   context.restore();
 };
 
+//  X-axis
 Graph.prototype.drawXAxis = function() {
   var context = this.context;        
   // Draw x axis
@@ -255,7 +265,6 @@ Graph.prototype.drawXAxis = function() {
   context.stroke();
 
   // draw tick marks
-  var xPosIncrement = this.tickX * (this.unitX);
   context.font = this.font;
   context.textAlign = 'center';
   context.textBaseline = 'top';
@@ -268,10 +277,10 @@ Graph.prototype.drawXAxis = function() {
     context.lineTo(xPos, this.marginY + this.tickSize / 2);
     context.stroke();
     this.drawText(x, xPos, this.marginY - 5);
-    xPos = Math.round(xPos + xPosIncrement);
   }
 };
 
+// Y-axis
 Graph.prototype.drawYAxis = function() {
   var context = this.context;
   context.beginPath();
@@ -296,6 +305,7 @@ Graph.prototype.drawYAxis = function() {
     this.drawText(y, this.marginX - 5, yPos);
   }
 };
+
 // We have to flip our Y again when drawing text
 // If this ever gets so slow we should batch these to reduce context changes
 Graph.prototype.drawText = function(text, x, y) {
@@ -316,10 +326,12 @@ Graph.prototype.getPixelX = function(x) {
   return this.marginX + (x - this.minX)  * this.scaleX;
 };
 
+// Same for Y
 Graph.prototype.getPixelY = function(y) {
   return this.marginY + (y - this.minY) * this.scaleY;
 };
 
+// Draw the graph
 Graph.prototype.draw = function() {
   var context = this.context;
   let equation = this.equation
@@ -327,42 +339,18 @@ Graph.prototype.draw = function() {
   context.save();
   context.beginPath();
   context.moveTo(this.getPixelX(this.minX), this.getPixelY(equation(this.minX)));
-  let clip = false;
   for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
     let y = equation(x);
-    
-    // Handle not drawing below minY or above maxY
-    if(y < this.minY ) {
-      if(clip) {
-        context.moveTo(this.getPixelX(x), this.getPixelY(this.minY));
-      }
-      else {
-        context.lineTo(this.getPixelX(x), this.getPixelY(this.minY));
-        clip = true;
-      }
-      continue;
-    }
-
-    else if(y > this.maxY) {
-      if(clip) {
-        context.moveTo(this.getPixelX(x), this.getPixelY(this.maxY));
-      }
-      else {
-        context.lineTo(this.getPixelX(x), this.getPixelY(this.maxY));
-        clip = true;
-      }
-      continue;
-    }
-    clip = false;
     context.lineTo(this.getPixelX(x), this.getPixelY(y));
   }
   context.lineJoin = 'round';
   context.lineWidth = 3;
-  context.strokeStyle = "green";
+  context.strokeStyle = this.color;
   context.stroke();
   context.restore();
 };
 
+// Draw part of a graph to highlight under it
 Graph.prototype.highlightArea = function(startX, endX, color) {
   var context = this.context;
   let equation = this.equation;
@@ -385,11 +373,13 @@ Graph.prototype.highlightArea = function(startX, endX, color) {
   context.restore();
 };
 
+// Flip y-axis so 0 is on the bottom
 Graph.prototype.transformContext = function() {
   var context = this.context;
   context.transform(1, 0, 0, -1, 0, this.canvas.height);
 };
 
+// Set of functions to make canvas compatible with device resolution
 var PIXEL_RATIO = (function () {
     var ctx = document.createElement("canvas").getContext("2d"),
         dpr = window.devicePixelRatio || 1,
@@ -402,7 +392,7 @@ var PIXEL_RATIO = (function () {
     return dpr / bsr;
 })();
 
-
+// Create canvas with ratio
 var createHiDPICanvas = function(w, h, ratio) {
     if (!ratio) { ratio = PIXEL_RATIO; }
     var can = document.createElement("canvas");
@@ -414,7 +404,7 @@ var createHiDPICanvas = function(w, h, ratio) {
     return can;
 }
 
-//Create canvas with the device resolution.
+// Create canvas with the device resolution (ratio of 1 instead of pixel ratio)
 var myCanvas = createHiDPICanvas(500, 320, 1);
 // Add canvas
 document.getElementById("canvasContainer").appendChild(myCanvas);
