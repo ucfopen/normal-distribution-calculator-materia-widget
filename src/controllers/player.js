@@ -100,24 +100,20 @@ function updateChart() {
   myGraph = new Graph({
           canvas: myCanvas,
           minX: minX,
-          minY: 0,
           maxX: maxX,
-          maxY: 0.5,
           tickX: stddev,
+          color: 'black',
           equation: function(x) { return probDensity(x, mean, stddev); },
   });
 
   myGraph.draw();
-
   // update info panel on bottom
   mean_output.innerHTML = mean;
   stddev_output.innerHTML = stddev;
   var_output.innerHTML = Math.pow(stddev, 2).toFixed(2);
   
+  // Don't highlight anything is X isn't selected and in the bounds of the graph
   if(isNaN(x) || x < minX || x > maxX) return;
-  // Highlight X
-  myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
-  
   // Highlight selected area
   if(probType == "left") {
     myGraph.highlightArea(minX, x, '#f1cdccb8');
@@ -132,7 +128,9 @@ function updateChart() {
     myGraph.highlightArea(right, maxX, '#f1cdccb8');
 
   }
-
+  
+  // Highlight X
+  myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
 }
 
 // X input has changed, try to give answer and then update chart
