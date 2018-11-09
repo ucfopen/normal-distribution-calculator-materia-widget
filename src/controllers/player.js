@@ -11,6 +11,7 @@ var leftOption = document.getElementById("leftOption");
 var rightOption = document.getElementById("rightOption");
 var absOption = document.getElementById("absOption");
 
+
 mean_input.addEventListener("input", updateChart);
 stddev_input.addEventListener("input", updateChart);
 x_input.addEventListener("input", updateX);
@@ -64,8 +65,10 @@ function probDensity(x, mean, stddev) {
 
 // Calc the z score
 function zScore(x, mean, stddev) {
+  if(stddev == 0) return 0;
   return (x - mean) / stddev;
 }
+
 // Round value to decimal places
 function _round(value, decimalPlaces) {
   const factor = Math.pow(10, decimalPlaces);
@@ -88,12 +91,25 @@ function culmulativeProb(x, mean, stddev) {
   return z < 0 ? 1 - absPercentile : absPercentile;
 }
 
+module.exports = {
+  probDensity: probDensity,
+  zScore: zScore,
+  _round: _round,
+  culmulativeProb: culmulativeProb,
+  zTable: zTable
+};
+
 // Something has changed, try to update chart
 function updateChart() {
   const mean = parseFloat(mean_input.value);
   const stddev = parseFloat(stddev_input.value);
   const x = parseFloat(x_input.value);
   const probType = probType_input.value;
+
+  if (isNaN(mean) || isNaN(stddev) || stddev <= 0 || isNaN(x)) {
+    
+    return;
+  }
 
   let minX = mean - stddev * 3;
   let maxX = mean + stddev * 3;
@@ -216,7 +232,6 @@ Graph.prototype.init = function(config) {
 
 // Figure out ticks on Y axis
 Graph.prototype.calcY = function() {
-
   let max = Number.NEGATIVE_INFINITY;
   let min = Number.POSITIVE_INFINITY;
   for(let x = this.minX; x < this.maxX; x += this.tickX) {
@@ -236,7 +251,7 @@ Graph.prototype.calcY = function() {
 
 // Draw axes and labels for them
 Graph.prototype.drawAxes = function(){
-  var context = this.context;
+  let context = this.context;
   context.resetTransform();
   this.transformContext();
   this.drawXAxis();
@@ -253,7 +268,7 @@ Graph.prototype.drawAxes = function(){
 
 //  X-axis
 Graph.prototype.drawXAxis = function() {
-  var context = this.context;        
+  let context = this.context;        
   // Draw x axis
   context.beginPath();
   context.moveTo(this.marginX, this.marginY);
@@ -280,7 +295,7 @@ Graph.prototype.drawXAxis = function() {
 
 // Y-axis
 Graph.prototype.drawYAxis = function() {
-  var context = this.context;
+  let context = this.context;
   context.beginPath();
   context.moveTo(this.marginX, this.marginY);
   context.lineTo(this.marginX, this.canvas.height - this.marginTop);
@@ -331,7 +346,7 @@ Graph.prototype.getPixelY = function(y) {
 
 // Draw the graph
 Graph.prototype.draw = function() {
-  var context = this.context;
+  let context = this.context;
   let equation = this.equation
 
   context.save();
@@ -350,7 +365,7 @@ Graph.prototype.draw = function() {
 
 // Draw part of a graph to highlight under it
 Graph.prototype.highlightArea = function(startX, endX, color) {
-  var context = this.context;
+  let context = this.context;
   let equation = this.equation;
   context.save();
   context.beginPath();
@@ -373,37 +388,45 @@ Graph.prototype.highlightArea = function(startX, endX, color) {
 
 // Flip y-axis so 0 is on the bottom
 Graph.prototype.transformContext = function() {
-  var context = this.context;
+  let context = this.context;
   context.transform(1, 0, 0, -1, 0, this.canvas.height);
 };
 
-// Set of functions to make canvas compatible with device resolution
-var PIXEL_RATIO = (function () {
-    var ctx = document.createElement("canvas").getContext("2d"),
-        dpr = window.devicePixelRatio || 1,
-        bsr = ctx.webkitBackingStorePixelRatio ||
-              ctx.mozBackingStorePixelRatio ||
-              ctx.msBackingStorePixelRatio ||
-              ctx.oBackingStorePixelRatio ||
-              ctx.backingStorePixelRatio || 1;
+var myCanvas, ctx;
+// ENTRY POINT
+// We run this code on dom content load to make sure its not executed on tests
+document.addEventListener('DOMContentLoaded', function(){
+  var PIXEL_RATIO = (function () {
+      var ctx = document.createElement("canvas").getContext("2d");
+          dpr = window.devicePixelRatio || 1;
+          bsr = ctx.webkitBackingStorePixelRatio ||
+                ctx.mozBackingStorePixelRatio ||
+                ctx.msBackingStorePixelRatio ||
+                ctx.oBackingStorePixelRatio ||
+                ctx.backingStorePixelRatio || 1;
+      return dpr / bsr;
+  })();
 
-    return dpr / bsr;
-})();
+  // Create canvas with ratio
+  function createHiDPICanvas(w, h, ratio) {
+      if (!ratio) { ratio = PIXEL_RATIO; }
+      var can = document.createElement("canvas");
+      can.width = w * ratio;
+      can.height = h * ratio;
+      can.style.width = w + "px";
+      can.style.height = h + "px";
+      can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+      return can;
+  }
 
-// Create canvas with ratio
-var createHiDPICanvas = function(w, h, ratio) {
-    if (!ratio) { ratio = PIXEL_RATIO; }
-    var can = document.createElement("canvas");
-    can.width = w * ratio;
-    can.height = h * ratio;
-    can.style.width = w + "px";
-    can.style.height = h + "px";
-    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
-    return can;
-}
+  // Entry point
+  // Create canvas with the device resolution (ratio of 1 instead of pixel ratio)
+  myCanvas = createHiDPICanvas(500, 320, 1);
+  // Add canvas
+  document.getElementById("canvasContainer").appendChild(myCanvas);
+  ctx = myCanvas.getContext('2d');
 
-// Create canvas with the device resolution (ratio of 1 instead of pixel ratio)
-var myCanvas = createHiDPICanvas(500, 320, 1);
-// Add canvas
-document.getElementById("canvasContainer").appendChild(myCanvas);
-var ctx = myCanvas.getContext('2d');
+  // Init draw
+  updateChart();
+}, false);
+

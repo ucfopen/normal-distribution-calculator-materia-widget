@@ -12,7 +12,7 @@
     "build-dev": "webpack",
     "build": "webpack -p",
     "pretest": "npm run build-dev",
-    "test": "karma start ./karma.conf.js --no-auto-watch --single-run"
+    "test": "jest"
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "devDependencies": {
@@ -21,6 +21,7 @@
     "angular-mocks": "~1.5.0",
     "angular-route": "~1.5.0",
     "jasmine-core": "^2.4.1",
+    "jest": "^23.6.0",
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
     "karma-eslint": "^2.1.0",
