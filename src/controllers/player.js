@@ -107,7 +107,7 @@ function updateChart() {
   const probType = probType_input.value;
 
   if (isNaN(mean) || isNaN(stddev) || stddev <= 0 || isNaN(x)) {
-    
+
     return;
   }
 
@@ -127,7 +127,7 @@ function updateChart() {
   mean_output.innerHTML = mean;
   stddev_output.innerHTML = stddev;
   var_output.innerHTML = Math.pow(stddev, 2).toFixed(2);
-  
+
   // Don't highlight anything is X isn't selected and in the bounds of the graph
   if(isNaN(x) || x < minX || x > maxX) return;
   // Highlight selected area
@@ -144,7 +144,7 @@ function updateChart() {
     myGraph.highlightArea(right, maxX, '#f1cdccb8');
 
   }
-  
+
   // Highlight X
   myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
 }
@@ -174,13 +174,13 @@ function Graph(config) {
 Graph.prototype.init = function(config) {
   // user defined properties
   this.canvas = config.canvas;
-  
+
   this.minX = config.minX || 0;
   this.minY = config.minY || 0; // for use if tickY isn't set
-  
+
   this.maxX = config.maxX || 10;
   this.maxY = config.maxY || 10; // for use if tickY isn't set
-  
+
   // Space on left until X's 0 starts (axis and label are drawn in this space)
   this.marginX = config.maginX || 60;
   // Space on bottom until Y's 0 starts (axis and label are drawn in this space)
@@ -192,13 +192,13 @@ Graph.prototype.init = function(config) {
 
   this.labelX = config.labelX || "x";
   this.labelY = config.labelY || "f(x)";
-  
+
   this.color = config.color || "green";
 
   this.equation = config.equation;
   // How many samples to take inbetween each point
   this.resolution = config.resolution || 100;
-  
+
   this.tickX = config.tickX || 1;
   this.iteration = (this.maxX - this.minX) / this.resolution;
   // If tickY is set use that, otherwise we recalculate tickY, minY, and maxY based on equation and min/max X
@@ -268,7 +268,7 @@ Graph.prototype.drawAxes = function(){
 
 //  X-axis
 Graph.prototype.drawXAxis = function() {
-  let context = this.context;        
+  let context = this.context;
   // Draw x axis
   context.beginPath();
   context.moveTo(this.marginX, this.marginY);
@@ -328,7 +328,7 @@ Graph.prototype.drawText = function(text, x, y) {
   context.resetTransform();
   // is text a number
   if(!isNaN(text)) {
-    text = text == Math.floor(text) ? text : text.toFixed(2); // Convert to at most 2 digits decimal 
+    text = text == Math.floor(text) ? text : text.toFixed(2); // Convert to at most 2 digits decimal
   }
   context.fillText(text, x, y);
   context.restore();
@@ -369,7 +369,7 @@ Graph.prototype.highlightArea = function(startX, endX, color) {
   let equation = this.equation;
   context.save();
   context.beginPath();
-  
+
   let startY = equation(startX);
   context.moveTo(this.getPixelX(startX), this.getPixelY(this.minY));
   startY = Math.max(startY, this.minY);
@@ -398,8 +398,8 @@ var myCanvas, ctx;
 document.addEventListener('DOMContentLoaded', function(){
   var PIXEL_RATIO = (function () {
       var ctx = document.createElement("canvas").getContext("2d");
-          dpr = window.devicePixelRatio || 1;
-          bsr = ctx.webkitBackingStorePixelRatio ||
+      var dpr = window.devicePixelRatio || 1;
+      var bsr = ctx.webkitBackingStorePixelRatio ||
                 ctx.mozBackingStorePixelRatio ||
                 ctx.msBackingStorePixelRatio ||
                 ctx.oBackingStorePixelRatio ||
