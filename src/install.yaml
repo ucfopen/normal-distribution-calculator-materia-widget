@@ -1,6 +1,5 @@
----
 general:
-  name: Normal Distribution Widget
+  name: Normal Distribution Calculator
   group: Materia
   height: 500
   width: 750
@@ -14,6 +13,7 @@ general:
 files:
   player: player.html
   flash_version: 0
+  creator: default
 score:
   is_scorable: No
 meta_data:
@@ -22,7 +22,7 @@ meta_data:
   supported_data:
     - Multiple Choice
   about: >
-    Widget that allows you to change variables and watch the normal distribution graph change. 
+    Allows you to change variables and watch the normal distribution graph change.
 
   # The text displayed on the widget catalog page.
   excerpt: >
