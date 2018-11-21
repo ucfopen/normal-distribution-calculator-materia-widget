@@ -4,7 +4,6 @@ const widgetWebpack = require('materia-widget-development-kit/webpack-widget')
 
 const rules = widgetWebpack.getDefaultRules()
 const entries = widgetWebpack.getDefaultEntries();
-const copy = widgetWebpack.getDefaultCopyList();
 
 // cusomize the config
 delete entries['creator.js'];
@@ -37,10 +36,8 @@ let customRules = [
 let options = {
 	entries: entries,
 	moduleRules: customRules,
-	copyList: copy
 };
 
-const ourFinalWebpackConfig = widgetWebpack.getLegacyWidgetBuildConfig(options);
-module.exports = ourFinalWebpackConfig;
+module.exports = widgetWebpack.getLegacyWidgetBuildConfig(options);;
 
 
