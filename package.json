@@ -1,7 +1,7 @@
 {
-  "name": "@ucfopen/template-widget",
+  "name": "@ucfopen/normal-distribution",
   "materia": {
-    "cleanName": "template-widget"
+    "cleanName": "normal-distribution"
   },
   "dependencies": {
     "angular": "1.6.9",
@@ -48,7 +48,7 @@
     }
   },
   "author": "University of Central Florida, Center for Distributed Learning",
-  "description": "Template widget to use as an example.",
+  "description": "Interactive Graph widget showing normal distribution.",
   "license": "AGPL-3.0",
   "version": "1.0.1"
 }
