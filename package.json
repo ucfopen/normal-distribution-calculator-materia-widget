@@ -1,33 +1,54 @@
 {
-  "name": "@ucfcdl/hello-world",
+  "name": "@ucfopen/template-widget",
   "materia": {
-    "cleanName": "hello-world"
+    "cleanName": "template-widget"
   },
-  "version": "2.0.1",
   "dependencies": {
-    "materia-widget-development-kit": "^2.0.0"
+    "angular": "1.6.9",
+    "angular-mocks": "1.6.9",
+    "babel-preset-react": "^6.24.1",
+    "jest": "^23.6.0",
+    "jest-coffee-preprocessor": "^1.0.0",
+    "materia-widget-development-kit": "^2.0.0",
+    "ng-annotate-loader": "^0.6.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-test-renderer": "^16.5.2"
   },
   "scripts": {
     "start": "webpack-dev-server",
-    "build-dev": "webpack",
     "build": "webpack -p",
-    "pretest": "npm run build-dev",
-    "test": "jest"
+    "build-dev": "webpack",
+    "test": "TZ='America/New_York' jest --verbose",
+    "test-ci": "TZ='America/New_York' CI=true jest --ci --useStderr --coverage --coverageReporters text-summary cobertura"
+  },
+  "jest": {
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "verbose": false,
+    "transform": {
+      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.coffee$": "<rootDir>/node_modules/jest-coffee-preprocessor/index.js"
+    },
+    "moduleFileExtensions": [
+      "coffee",
+      "js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,coffee}"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+      }
+    }
   },
   "author": "University of Central Florida, Center for Distributed Learning",
-  "devDependencies": {
-    "angular": "~1.5.0",
-    "angular-loader": "~1.5.0",
-    "angular-mocks": "~1.5.0",
-    "angular-route": "~1.5.0",
-    "jasmine-core": "^2.4.1",
-    "jest": "^23.6.0",
-    "karma": "^0.13.22",
-    "karma-coverage": "^0.5.5",
-    "karma-eslint": "^2.1.0",
-    "karma-jasmine": "^0.3.8",
-    "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-mocha-reporter": "^2.1.0",
-    "karma-phantomjs-launcher": "^1.0.2"
-  }
+  "description": "Template widget to use as an example.",
+  "license": "AGPL-3.0",
+  "version": "1.0.1"
 }
