@@ -12,10 +12,11 @@ general:
   api_version: 2
 files:
   player: player.html
-  flash_version: 0
   creator: default
+  flash_version: 0
 score:
   is_scorable: No
+  score_module: NormalDistributionCalculator
 meta_data:
   features:
     - Interactive

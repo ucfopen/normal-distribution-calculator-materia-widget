@@ -1,51 +1,17 @@
 {
-  "name": "@ucfopen/normal-distribution",
+  "name": "@ucfopen/normal-distribution-calculator",
   "materia": {
-    "cleanName": "normal-distribution"
+    "cleanName": "normal-distribution-calculator"
   },
   "dependencies": {
-    "angular": "1.6.9",
-    "angular-mocks": "1.6.9",
-    "babel-preset-react": "^6.24.1",
-    "jest": "^23.6.0",
-    "jest-coffee-preprocessor": "^1.0.0",
-    "materia-widget-development-kit": "^2.0.0",
-    "ng-annotate-loader": "^0.6.1",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-test-renderer": "^16.5.2"
+    "materia-widget-development-kit": "^2.0.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack -p",
     "build-dev": "webpack",
-    "test": "TZ='America/New_York' jest --verbose",
-    "test-ci": "TZ='America/New_York' CI=true jest --ci --useStderr --coverage --coverageReporters text-summary cobertura"
-  },
-  "jest": {
-    "coverageReporters": [
-      "text",
-      "lcov"
-    ],
-    "verbose": false,
-    "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.coffee$": "<rootDir>/node_modules/jest-coffee-preprocessor/index.js"
-    },
-    "moduleFileExtensions": [
-      "coffee",
-      "js"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{js,coffee}"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 100,
-        "functions": 100,
-        "lines": 100
-      }
-    }
+    "test": "echo 'tests not implemented'",
+    "test-ci": "echo 'tests not implemented'"
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": "Interactive Graph widget showing normal distribution.",
