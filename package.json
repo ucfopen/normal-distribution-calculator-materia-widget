@@ -1,33 +1,20 @@
 {
-  "name": "@ucfcdl/hello-world",
+  "name": "@ucfopen/normal-distribution-calculator",
   "materia": {
-    "cleanName": "hello-world"
+    "cleanName": "normal-distribution-calculator"
   },
-  "version": "2.0.1",
   "dependencies": {
     "materia-widget-development-kit": "^2.0.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
-    "build-dev": "webpack",
     "build": "webpack -p",
-    "pretest": "npm run build-dev",
-    "test": "jest"
+    "build-dev": "webpack",
+    "test": "echo 'tests not implemented'",
+    "test-ci": "echo 'tests not implemented'"
   },
   "author": "University of Central Florida, Center for Distributed Learning",
-  "devDependencies": {
-    "angular": "~1.5.0",
-    "angular-loader": "~1.5.0",
-    "angular-mocks": "~1.5.0",
-    "angular-route": "~1.5.0",
-    "jasmine-core": "^2.4.1",
-    "jest": "^23.6.0",
-    "karma": "^0.13.22",
-    "karma-coverage": "^0.5.5",
-    "karma-eslint": "^2.1.0",
-    "karma-jasmine": "^0.3.8",
-    "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-mocha-reporter": "^2.1.0",
-    "karma-phantomjs-launcher": "^1.0.2"
-  }
+  "description": "Interactive graph widget showing normal distribution.",
+  "license": "AGPL-3.0",
+  "version": "1.0.0"
 }

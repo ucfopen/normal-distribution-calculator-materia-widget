@@ -4,7 +4,7 @@ general:
   height: 500
   width: 750
   in_catalog: Yes
-  is_editable: Yes
+  is_editable: No
   is_playable: Yes
   is_qset_encrypted: Yes
   is_answer_encrypted: Yes
@@ -12,10 +12,11 @@ general:
   api_version: 2
 files:
   player: player.html
-  flash_version: 0
   creator: default
+  flash_version: 0
 score:
   is_scorable: No
+  score_module: NormalDistributionCalculator
 meta_data:
   features:
     - Interactive

@@ -1,18 +1,19 @@
-const path = require('path')
+const path = require('path');
 
-// load the reusable legacy webpack config from materia-widget-dev
-let webpackConfig = require('materia-widget-development-kit/webpack-widget').getLegacyWidgetBuildConfig()
+const widgetWebpack = require('materia-widget-development-kit/webpack-widget')
+
+const rules = widgetWebpack.getDefaultRules()
+const entries = widgetWebpack.getDefaultEntries();
 
 // cusomize the config
-delete webpackConfig.entry['creator.js']
-delete webpackConfig.entry['creator.css']
-delete webpackConfig.entry['player.js']
+delete entries['creator.js'];
+delete entries['creator.css'];
+delete entries['player.js'];
 
-//webpackConfig.entry['controllers/creator.js'] = [path.join(__dirname, 'src', 'controllers', 'creator.coffee')]
-// webpackConfig.entry['controllers/graph.js'] = [path.join(__dirname, 'src', 'controllers', 'graph.js')]
-webpackConfig.entry['controllers/player.js'] = [path.join(__dirname, 'src', 'controllers', 'player.js')]
+entries['controllers/player.js'] = [path.join(__dirname, 'src', 'controllers', 'player.js')];
 
-webpackConfig.module.rules[0] = {
+// All JS passed through Babel
+babelJS = {
   test: /\.js$/i,
   exclude: /node_modules/,
   use: {
@@ -21,6 +22,22 @@ webpackConfig.module.rules[0] = {
       presets: ['env']
     }
   }
-}
+};
 
-module.exports = webpackConfig
+let customRules = [
+	rules.copyImages,
+	rules.loadHTMLAndReplaceMateriaScripts,
+	rules.loadAndPrefixCSS,
+	rules.loadAndPrefixSASS,
+	babelJS, // <--- Babel loader for JS Files
+];
+
+// options for the build
+let options = {
+	entries: entries,
+	moduleRules: customRules,
+};
+
+module.exports = widgetWebpack.getLegacyWidgetBuildConfig(options);;
+
+
