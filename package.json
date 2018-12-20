@@ -14,7 +14,7 @@
     "test-ci": "echo 'tests not implemented'"
   },
   "author": "University of Central Florida, Center for Distributed Learning",
-  "description": "Interactive Graph widget showing normal distribution.",
+  "description": "Interactive graph widget showing normal distribution.",
   "license": "AGPL-3.0",
-  "version": "1.0.1"
+  "version": "1.0.0"
 }
