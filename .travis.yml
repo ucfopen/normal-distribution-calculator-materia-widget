@@ -1,0 +1,30 @@
+language: node_js
+node_js:
+  - '6'
+cache:
+  yarn: true
+  directories:
+    - node_modules
+before_install:
+  - npm config set spin false
+  - npm install -g npm@^5
+script:
+  - yarn test-ci
+  - yarn build
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: "lMKBog2cdgy93iU0J1hYh6k28sOouDReQdQebNf9qqfoYkNyZeSj12LPhdFuAOSpQ69+UYyN+XqL4v6HeixGQQPKOlhw47xk5iv087hEunGPkzHwYp+T3o1AczBFHO8DVzR5f/ltXq3s7y0atCvS9SU2Loejh6q9nIshnLFYd2qE4JKZdO830WBplrz3DCrV/XYBSedx2MMCIIgWk8d51amkWTnCy72giBiyovbRkI2su0OooguAOjcqBMOGDQhWGVud1A5CG+uuRHr7bgbrZVS+ZlXJO7xkRTu41YjzxPRiLsXvTTC8s+REH8zfQ95jgSV7LUyeP7W11NkcrrGku6qiKs+yMaaZi8TzWyzYiv7NZ7d/E1BL0QRZgPqaxTxq6GCLuhmIc7yHlo+8UgdlsC0A5zEC03UJWJaIG3eett7nYoM+/uOeZvK7XfKiUupYxU3RJwoDEWYN3MPhZaVkPZAQF23U9DiHjXX9uLio2pg9IcqWUdvpe0ZGBRFK/UGZbzxA0UHlat+z6ddAjpi1yY/Mm7sgYoo/4wfMvSl4vjuvehjywbhr07DvkgnB759FRjR7jxSksgM13qScZJycQxu6u1J8EupC/rJeEArzNNHLnzXfXALXEqlX6a1QjRKslSxEfj2gD9vWDyvjURaAh91ww2xIlBwFBilP8wONn1U="
+  file:
+    - build/_output/normal-distribution-calculator.wigt
+    - build/_output/normal-distribution-calculator-build-info.yml
+  on:
+    tags: true
+    repo: ucfopen/normal-distribution-calculator-materia-widget
+notifications:
+  email: false
+  slack:
+    secure: "nanx8adEGCHOwZGYT0aw5bnqEJ830XjO1UX0lH/WVWdtUQOti9HRV1a2Uwh90RKDp5uERdN5QbsuxJaqR+a/giP3mqrjGiEhaUx987fGj7KFQ3cSclqUIQczSIGcd/vgp95dWHojI6eMfwVo1y6XmQJP+5jlCu4Pcgpj7jQnxXzfPOUSfQF/390bHeWRlsCyMJI2zL0iJU6ROKqmZdBc2pSPVjxKyJEucbUoBGrhZem7f6taREkAe8N4PbbNI1S7lmGiB5lbbNOj45LDiEGtyaqyl2FNNUKtuTZ45sZahJEo2UlILJsjCT+7cEMgZUoHBXITB/lrmkwsBVlIFGRpBjDUCg3zwb7YiQqHpSvE828nL5kJw+5IGkU+JzVvnS6PnMSaeSNJYB8alXuXn05ZkETPwQD+SL1XhFGwHUNeSjVADZOrx9IuqlxyC5t0z5asXa6SMuspq+uUZ4suSNNL7HF8L3KI3/6O3D/WEa+CXSiOk99WFTAJWfZYSYdx6jjegvG0dJitzTbOa7a9Xg7hNiNRNsJGmp3sXkegZNoJ+W+nWsI/yz9n7p+j4rQyeFh/cCJuCFY3vqoXfX388lGp1k2HuX4Jc0KnpM3hhgRMTQCqBM3n7OFQW22R0EUrGqbkRX0WVBY5qGBDyOHxbZNoUt8aozhq2a6Sb7XVsgV4Pag="
+
+
