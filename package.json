@@ -6,12 +6,36 @@
   "dependencies": {
     "materia-widget-development-kit": "^2.3.0"
   },
+  "devDependencies": {
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0"
+  },
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack -p",
     "build-dev": "webpack",
-    "test": "echo 'tests not implemented'",
-    "test-ci": "echo 'tests not implemented'"
+    "test": "TZ='America/New_York' jest --verbose",
+    "test-ci": "TZ='America/New_York' CI=true jest --ci --useStderr --coverage"
+  },
+  "jest": {
+    "collectCoverageFrom": ["src/*"],
+    "coverageReporters": [
+      "text-summary",
+      "lcov",
+      "cobertura"
+    ],
+    "verbose": false,
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 10,
+        "branches": 8,
+        "functions": 10,
+        "lines": 10
+      }
+    }
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": "Interactive graph widget showing normal distribution.",
