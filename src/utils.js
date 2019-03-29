@@ -90,8 +90,8 @@ export const culmulativeProb = (x, mean, stddev) => {
 	var z = zScore(x, mean, stddev);
 	z = round(z, 2);
 	// check for outlier values
-	if(z >= 4) return 0;
-	if(z <= -4) return 1;
+	if(z >= 3.5) return 0;
+	if(z <= -3.5) return 1;
 	const absZScore = Math.abs(z);
 	const zRow = Math.floor(absZScore * 10) / 10;
 	const zCol = round((Math.round(absZScore * 100) % 10) / 100, 2);
