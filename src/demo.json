@@ -2,6 +2,8 @@
   "name": "Normal Distribution Calculator",
   "qset": {
     "version": 1,
-    "data": {}
+    "data": {
+      "empty": true
+    }
   }
 }
