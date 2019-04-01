@@ -133,20 +133,23 @@ function updateChart() {
   // Highlight selected area
   if(probType == "left") {
     myGraph.highlightArea(minX, x, '#f1cdccb8');
+    // Highlight X
+    myGraph.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
   }
   else if(probType == "right") {
     myGraph.highlightArea(x, maxX, '#f1cdccb8');
+    // Highlight X
+    myGraph.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
   }
   else if(probType == "abs") {
     let left = -Math.abs(x);
     let right = Math.abs(x);
     myGraph.highlightArea(minX, left, '#f1cdccb8');
     myGraph.highlightArea(right, maxX, '#f1cdccb8');
-
+    // Highlight X
+    myGraph.highlightArea(left - (stddev * 0.05), left + (stddev * 0.05), 'blue');
+    myGraph.highlightArea(right - (stddev * 0.05), right + (stddev * 0.05), 'blue');
   }
-
-  // Highlight X
-  myGraph.highlightArea(x - (stddev*0.05), x + (stddev*0.05), 'blue');
 }
 
 // X input has changed, try to give answer and then update chart
