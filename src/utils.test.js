@@ -45,4 +45,12 @@ describe('utils', () => {
 		}
 	})
 
+	test('probDensity should not return NaN and be in the 0-1 range', () =>{
+		for(let i = 0; i < 140; i++) {
+			let prob = probDensity(70 - i, 0, 20);
+			expect(prob).not.toBeNaN();
+			expect(prob).toBeGreaterThanOrEqual(0);
+			expect(prob).toBeLessThanOrEqual(1);
+		}
+	})
 })
