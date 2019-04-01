@@ -89,7 +89,7 @@ export default class Graph {
 		// draw this one rotated
 		context.save();
 		context.resetTransform();
-		context.translate(5, this.canvas.height - this.getPixelY((this.maxY + this.minY) / 2));
+		context.translate(10, this.canvas.height - this.getPixelY((this.maxY + this.minY) / 2));
 		context.rotate(-90 * Math.PI / 180);
 		context.fillText(this.labelY, 0, 0);
 		context.restore();
