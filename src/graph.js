@@ -81,14 +81,14 @@ export default class Graph {
 	// Draw axes and labels for them
 	drawAxes(){
 		let context = this.context;
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		this.transformContext();
 		this.drawXAxis();
 		this.drawYAxis();
 		this.drawText(this.labelX, this.getPixelX((this.maxX + this.minX)/2), this.marginY / 3);
 		// draw this one rotated
 		context.save();
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		context.translate(10, this.canvas.height - this.getPixelY((this.maxY + this.minY) / 2));
 		context.rotate(-90 * Math.PI / 180);
 		context.fillText(this.labelY, 0, 0);
@@ -154,7 +154,7 @@ export default class Graph {
 		let context = this.context;
 		context.save();
 		y = this.canvas.height - y;
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		// is text a number
 		if(!isNaN(text)) {
 			text = text == Math.floor(text) ? text : text.toFixed(2); // Convert to at most 2 digits decimal
