@@ -18,7 +18,9 @@
     "test-ci": "TZ='America/New_York' CI=true jest --ci --useStderr --coverage"
   },
   "jest": {
-    "collectCoverageFrom": ["src/*"],
+    "collectCoverageFrom": [
+      "src/*"
+    ],
     "coverageReporters": [
       "text-summary",
       "lcov",
@@ -40,5 +42,5 @@
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": "Interactive graph widget showing normal distribution.",
   "license": "AGPL-3.0",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
