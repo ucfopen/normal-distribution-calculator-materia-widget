@@ -81,14 +81,14 @@ export default class Graph {
 	// Draw axes and labels for them
 	drawAxes(){
 		let context = this.context;
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		this.transformContext();
 		this.drawXAxis();
 		this.drawYAxis();
 		this.drawText(this.labelX, this.getPixelX((this.maxX + this.minX)/2), this.marginY / 3);
 		// draw this one rotated
 		context.save();
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		context.translate(10, this.canvas.height - this.getPixelY((this.maxY + this.minY) / 2));
 		context.rotate(-90 * Math.PI / 180);
 		context.fillText(this.labelY, 0, 0);
@@ -154,7 +154,7 @@ export default class Graph {
 		let context = this.context;
 		context.save();
 		y = this.canvas.height - y;
-		context.resetTransform();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		// is text a number
 		if(!isNaN(text)) {
 			text = text == Math.floor(text) ? text : text.toFixed(2); // Convert to at most 2 digits decimal
@@ -191,28 +191,32 @@ export default class Graph {
 		context.stroke();
 		context.restore();
 
+		context.globalAlpha = 0.5;
+
 		// Don't highlight anything is X isn't selected and in the bounds of the graph
 		if(isNaN(x) || x < this.minX || x > this.maxX) return;
 		// Highlight selected area
 		if(probType == "left") {
-			this.highlightArea(this.minX, x, '#f1cdccb8');
+			this.highlightArea(this.minX, x, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
 		}
 		else if(probType == "right") {
-			this.highlightArea(x, this.maxX, '#f1cdccb8');
+			this.highlightArea(x, this.maxX, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
 		}
 		else if(probType == "abs") {
 			const left = -Math.abs(x);
 			const right = Math.abs(x);
-			this.highlightArea(this.minX, left, '#f1cdccb8');
-			this.highlightArea(right, this.maxX, '#f1cdccb8');
+			this.highlightArea(this.minX, left, '#f1cdcc');
+			this.highlightArea(right, this.maxX, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(left - (stddev * 0.05), left + (stddev * 0.05), 'blue');
 			this.highlightArea(right - (stddev * 0.05), right + (stddev * 0.05), 'blue');
 		}
+
+		context.globalAlpha = 1;
 	}
 
 	// Draw part of a graph to highlight under it
