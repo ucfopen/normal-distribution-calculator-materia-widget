@@ -3,15 +3,7 @@
   "qset": {
     "version": 1,
     "data": {
-      "items": [
-        {
-          "materiaType": "question",
-          "id": null,
-          "type": "MC",
-          "questions": [],
-          "answers": []
-        }
-      ]
+      "empty": true
     }
   }
 }
