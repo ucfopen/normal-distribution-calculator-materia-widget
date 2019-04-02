@@ -191,28 +191,32 @@ export default class Graph {
 		context.stroke();
 		context.restore();
 
+		context.globalAlpha = 0.5;
+
 		// Don't highlight anything is X isn't selected and in the bounds of the graph
 		if(isNaN(x) || x < this.minX || x > this.maxX) return;
 		// Highlight selected area
 		if(probType == "left") {
-			this.highlightArea(this.minX, x, '#f1cdccb8');
+			this.highlightArea(this.minX, x, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
 		}
 		else if(probType == "right") {
-			this.highlightArea(x, this.maxX, '#f1cdccb8');
+			this.highlightArea(x, this.maxX, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(x - (stddev * 0.05), x + (stddev * 0.05), 'blue');
 		}
 		else if(probType == "abs") {
 			const left = -Math.abs(x);
 			const right = Math.abs(x);
-			this.highlightArea(this.minX, left, '#f1cdccb8');
-			this.highlightArea(right, this.maxX, '#f1cdccb8');
+			this.highlightArea(this.minX, left, '#f1cdcc');
+			this.highlightArea(right, this.maxX, '#f1cdcc');
 			// Highlight X
 			this.highlightArea(left - (stddev * 0.05), left + (stddev * 0.05), 'blue');
 			this.highlightArea(right - (stddev * 0.05), right + (stddev * 0.05), 'blue');
 		}
+
+		context.globalAlpha = 1;
 	}
 
 	// Draw part of a graph to highlight under it
