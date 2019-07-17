@@ -53,4 +53,57 @@ describe('utils', () => {
 			expect(prob).toBeLessThanOrEqual(1);
 		}
 	})
-})
+
+	test('createHiDPICanvas attempts to create a canvas element correctly with all values provided', () => {
+		const mockSetTransform = jest.fn();
+		const mockGetContext = jest.fn(arg => {
+			return {
+				setTransform: mockSetTransform
+			};
+		});
+		const mockCreateElement = jest.fn(arg => {
+			return {
+				style: {},
+				getContext: mockGetContext
+			}
+		});
+		global.document.createElement = mockCreateElement;
+
+		const canvas = createHiDPICanvas(500, 320, 1);
+
+		expect(mockCreateElement).toHaveBeenCalledWith('canvas');
+		expect(mockGetContext).toHaveBeenCalledWith('2d');
+		expect(mockSetTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
+
+		expect(canvas.width).toBe(500);
+		expect(canvas.height).toBe(320);
+		expect(canvas.style).toEqual({width: '500px', height: '320px'});
+	});
+
+	test('createHiDPICanvas attempts to create a canvas element correctly with no ratio provided', () => {
+		const mockSetTransform = jest.fn();
+		const mockGetContext = jest.fn(arg => {
+			return {
+				setTransform: mockSetTransform
+			};
+		});
+		const mockCreateElement = jest.fn(arg => {
+			return {
+				style: {},
+				getContext: mockGetContext
+			}
+		});
+		global.document.createElement = mockCreateElement;
+
+		const canvas = createHiDPICanvas(500, 320);
+
+		expect(mockCreateElement).toHaveBeenCalledWith('canvas');
+		expect(mockGetContext).toHaveBeenCalledWith('2d');
+		expect(mockSetTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
+
+		expect(canvas.width).toBe(500);
+		expect(canvas.height).toBe(320);
+		expect(canvas.style).toEqual({width: '500px', height: '320px'});
+	});
+
+});
