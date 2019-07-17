@@ -1,3 +1,5 @@
+const PIXEL_RATIO = 1;
+
 // Calc the z score
 export const zScore = (x, mean, stddev) => {
 	if(stddev == 0) return 0;
@@ -25,18 +27,6 @@ export const createHiDPICanvas = (w, h, ratio) => {
 // Probabilty of finding X in distribution
 export const probDensity = (x, mean, stddev) =>
 	(1.0 / Math.sqrt(2.0 * Math.PI * stddev * stddev)) * Math.exp((- 1.0 / (2.0 * stddev * stddev)) * Math.pow(x - mean, 2.0))
-
-
-export const canvasPixelRatio = () => {
-	const ctx = document.createElement("canvas").getContext("2d");
-	const dpr = window.devicePixelRatio || 1;
-	const bsr = ctx.webkitBackingStorePixelRatio ||
-		ctx.mozBackingStorePixelRatio ||
-		ctx.msBackingStorePixelRatio ||
-		ctx.oBackingStorePixelRatio ||
-		ctx.backingStorePixelRatio || 1;
-	return dpr / bsr;
-}
 
 // Z table for lookups
 export const zTable = {

@@ -4,11 +4,11 @@
     "cleanName": "normal-distribution-calculator"
   },
   "dependencies": {
-    "materia-widget-development-kit": "^2.3.0"
+    "materia-widget-development-kit": "^2.4.2"
   },
   "devDependencies": {
-    "babel-jest": "^23.6.0",
-    "jest": "^23.6.0"
+    "babel-jest": "^24.8.0",
+    "jest": "^24.8.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
@@ -32,10 +32,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 11,
-        "branches": 11,
-        "functions": 35,
-        "lines": 10
+        "statements": 58,
+        "branches": 66,
+        "functions": 65,
+        "lines": 59
       }
     }
   },
