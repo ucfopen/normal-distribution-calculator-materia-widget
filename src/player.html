@@ -13,11 +13,11 @@
 			<h1 class="app-header">Normal Distribution Calculator</h1>
 			<form class="app-form">
 				<label for="mean">&mu; =</label>
-				<input id="mean" type="number" min="-150" max="150" name="mean" value="0">
+				<input aria-label="mu" id="mean" type="number" min="-150" max="150" name="mean" value="0">
 				<label for="stddev">&sigma; =</label>
-				<input id="stddev" type="number" min="0" max="150" step="0.1" name="stddev" value="1">
+				<input aria-label="standard deviation" id="stddev" type="number" min="0" max="150" step="0.1" name="stddev" value="1">
 				<label for="x">x =</label>
-				<input id="x" type="number" value="0">
+				<input aria-label="x value" id="x" type="number" value="0">
 				<select id="probType">
 					<option id="rightOption" value="right">P(X &gt; x) = </option>
 					<option id="leftOption" value="left">P(X &lt; x) = </option>
@@ -25,9 +25,9 @@
 				</select>
 		</form>
 
-			<div id="canvasContainer">
+			<div id="canvasContainer" tabindex="0" aria-label="This is a graph that plots the values which were inputted above.">
 			</div>
-			<div class="info">&mu;=E(X) = <span id="meanOut">0</span>&nbsp; &sigma; = SD(X) = <span id="stddevOut">1</span>&nbsp; &sigma;&sup2; = Var(X) = <span id="varOut">1</span></div>
+			<div class="info" tabindex="0">&mu;=E(X) = <span id="meanOut">0</span>&nbsp; &sigma; = SD(X) = <span id="stddevOut">1</span>&nbsp; &sigma;&sup2; = Var(X) = <span id="varOut">1</span></div>
 		</div>
 		<script src="player.js"></script>
 	</body>

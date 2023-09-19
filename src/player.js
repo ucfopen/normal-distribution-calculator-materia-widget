@@ -10,11 +10,15 @@ const getValuesFromInputs = () => ({
 })
 
 // updates the probabilty equation in the probType select drop down
+//jad: using setAttribute to 
 const updateProbTypeDisplay = (mean, stddev, x) => {
 	const {left, right, abs} = calculateAnswer(mean, stddev, x)
 	leftOptionEl.innerHTML = `P(X &lt; x) = ${left}`;
 	rightOptionEl.innerHTML = `P(X &gt; x) = ${right}`;
 	absOptionEl.innerHTML = `2P(X &gt; |x|) = ${abs}`;
+	leftOptionEl.setAttribute("aria-label",`P parenthesis uppercase X greater than lowercase x = ${left}`);
+	rightOptionEl.setAttribute("aria-label",`P parenthesis uppercase X less than lowercase x = ${right}`);
+	absOptionEl.setAttribute("aria-label",`2P parenthesis uppercase X greater than absolute value of lowercase x = ${abs}`);
 }
 
 // update output info panel
@@ -22,6 +26,9 @@ const updateEquationDisplay = (mean, stddev) => {
 	meanOutputEl.innerHTML = mean;
 	stddevOutputEL.innerHTML = stddev;
 	varOutputEL.innerHTML = Math.pow(stddev, 2).toFixed(2);
+	meanOutputEl.setAttribute("aria-label",`mu = E parenthesis uppercase x = ${mean}`);
+	stddevOutputEL.setAttribute("aria-label",`sigma = SD parenthesis uppercase x = ${stddev}`);
+	varOutputEL.setAttribute("aria-label",`sigma squared = Var parenthesis uppercase x = ${stddev}`);
 }
 
 // Draw the chart and update the display
