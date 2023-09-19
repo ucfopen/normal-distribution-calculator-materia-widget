@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [12.3.1]
 
     steps:
     - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
       uses: fregante/setup-git-user@v1
 
     - run: yarn install --frozen-lockfile
-    - run: yarn build
+    - run: yarn build-dev
 
     - name: Upload Release .wigt
       uses: svenstaro/upload-release-action@v2
