@@ -17,7 +17,7 @@ const updateProbTypeDisplay = (mean, stddev, x) => {
 	rightOptionEl.innerHTML = `P(X &gt; x) = ${right}`;
 	absOptionEl.innerHTML = `2P(X &gt; |x|) = ${abs}`;
 	leftOptionEl.setAttribute("aria-label",`P parenthesis uppercase X greater than lowercase x = ${left}`);
-	rightOptionEl.setAttribute("aria-label",`P parenthesis uppercase X less than lowercase x = ${left}`);
+	rightOptionEl.setAttribute("aria-label",`P parenthesis uppercase X less than lowercase x = ${right}`);
 	absOptionEl.setAttribute("aria-label",`2P parenthesis uppercase X greater than absolute value of lowercase x = ${abs}`);
 }
 
