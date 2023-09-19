@@ -112,14 +112,16 @@ canvas {
 	border-color:#00B0FF;
 }
 
-/** jad: added focus background */
 .info {
-	margin: 0 auto;
 	width: 400px;
+	margin: 0 auto;
+	padding: 5px;
+	text-align: center;
 }
 .info:focus
 {
-	background-color: #00f39c;
+	background-color: #abe4ff;
+	border-radius: 3px;
 }
 
 span {
