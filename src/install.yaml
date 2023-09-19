@@ -24,6 +24,10 @@ meta_data:
     - Multiple Choice
   about: >
     Allows you to change variables and watch the normal distribution graph change.
+  accessibility_keyboard: Full
+  accessibility_reader: Limited
+  accessibility_description: >
+    Inputs and resulting equation values are fully accessible. The graph visualization is not accessible to screen readers.
 
   # The text displayed on the widget catalog page.
   excerpt: >
