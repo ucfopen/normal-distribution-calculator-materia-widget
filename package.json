@@ -4,7 +4,7 @@
     "cleanName": "normal-distribution-calculator"
   },
   "dependencies": {
-    "materia-widget-development-kit": "../../MWDK4"
+    "materia-widget-development-kit": "~3.0.0"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",
