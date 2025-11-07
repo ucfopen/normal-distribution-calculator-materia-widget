@@ -4,12 +4,16 @@ const rules = widgetWebpack.getDefaultRules()
 const entries = widgetWebpack.getDefaultEntries();
 
 // remove some default entries
-delete entries['creator.js'];
-delete entries['creator.css'];
-delete entries['player.js'];
+delete entries['creator'];
 
 // add our player controller
-entries['player.js'] = [path.join(__dirname, 'src', 'player.js')];
+entries['player'] = [
+	path.join(__dirname, 'src', 'player.html'),
+	path.join(__dirname, 'src', 'player.js'),
+	path.join(__dirname, 'src', 'utils.js'),
+	path.join(__dirname, 'src', 'graph.js'),
+	path.join(__dirname, 'src', 'player.scss')
+];
 
 let customRules = [
 	rules.copyImages,
