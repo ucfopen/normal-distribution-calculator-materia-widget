@@ -32,3 +32,5 @@ meta_data:
   # The text displayed on the widget catalog page.
   excerpt: >
     Change values and watch the normal distribution graph change
+  update_method: github
+  repo: ucfopen/normal-distribution-calculator-materia-widget

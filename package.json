@@ -4,7 +4,7 @@
     "cleanName": "normal-distribution-calculator"
   },
   "dependencies": {
-    "materia-widget-development-kit": "~3.0.0"
+    "materia-widget-development-kit": "3.0.4"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",
@@ -42,5 +42,5 @@
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": "Interactive graph widget showing normal distribution.",
   "license": "AGPL-3.0",
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
