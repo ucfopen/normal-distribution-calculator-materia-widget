@@ -18,7 +18,6 @@ entries['player'] = [
 let customRules = [
 	rules.copyImages,
 	rules.loadHTMLAndReplaceMateriaScripts,
-	rules.loadAndPrefixCSS,
 	rules.loadAndPrefixSASS,
 ];
 

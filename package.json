@@ -11,10 +11,11 @@
     "jest": "^23.6.0"
   },
   "scripts": {
-	"start": "mwdk-start",
+    "start": "mwdk-start",
     "build": "mwdk-build-prod",
     "build-dev": "mwdk-build-dev",
-    "test": "TZ='America/New_York' jest --verbose"
+    "test": "TZ='America/New_York' jest --verbose",
+    "test-ci": "TZ='America/New_York' CI=true jest --ci --useStderr --coverage"
   },
   "jest": {
     "collectCoverageFrom": [
